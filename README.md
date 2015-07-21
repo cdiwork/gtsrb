@@ -14,7 +14,7 @@ Note that since I didn't have an IDE I played around directly in the notebook so
 
 The approach is pretty straightforward and as close as I could make it to #27 from the paper. This means 2 conv layers with abs(tanh(x)) non-linearities and both additive and divisive normalization. Then the MLP with tanh non-linearities. The parameters are very similar to the ones in the paper. The "matching" mode is 1-NN on the last layer (layer 18) or the vectorized response of the last convolutional layer (after the non-linearities). The result for matching is around 86%.
 
-Added the "multi-scale" architecture via Replicate, SplitTable, ParallelTable then JoinTable. The parameter tuning is still ongoing but recognition results are already in the 90%.
+Added the "multi-scale" architecture (conf=5) via Replicate, SplitTable, ParallelTable then JoinTable. The parameter tuning is still ongoing but recognition results are already in the 90%.
 
 I started looking a bit at the skip layer architecture or the distance thing you use. I'll try to have a look when I have some time again.
 
