@@ -210,87 +210,91 @@ elseif config == 4 then
   nfeats = {100,200,200,200}
   filtsize = 5
   nclasses = 43
-  model = nn.Sequential()
-  
-  -- first block : convolutional
-  model:add(nn.SpatialContrastiveNormalization(cdims,image.gaussian(5)))
-  model:add(nn.SpatialConvolutionMM(cdims,nfeats[1],filtsize,filtsize,1,1))
-  model:add(nn.Tanh())
-  model:add(nn.ReLU())
-  model:add(nn.SpatialSubtractiveNormalization(nfeats[1],kernel_subtractive))
-  model:add(nn.SpatialDivisiveNormalization(nfeats[1],kernel_divisive))  
-  model:add(nn.SpatialMaxPooling(2,2,2,2))
-  
-  -- second block : convolutional
-  model:add(nn.SpatialConvolutionMM(nfeats[1],nfeats[2],filtsize,filtsize,1,1))
-  model:add(nn.Tanh())
-  model:add(nn.ReLU())
-  model:add(nn.SpatialSubtractiveNormalization(nfeats[2],kernel_subtractive))
-  model:add(nn.SpatialDivisiveNormalization(nfeats[2],kernel_divisive))  
-  model:add(nn.SpatialMaxPooling(2,2,2,2))
-  
-  -- third block : standard 2-layer neural network
-  model:add(nn.Reshape(nfeats[2]*filtsize*filtsize))
-  model:add(nn.Linear(nfeats[2]*filtsize*filtsize,nfeats[3]))
-  model:add(nn.Tanh())
-  model:add(nn.ReLU())
-  model:add(nn.Linear(nfeats[3], nfeats[4]))
-  model:add(nn.Tanh())
-  model:add(nn.ReLU())
-  model:add(nn.Linear(nfeats[4], nclasses))
-  model:add(nn.Tanh())
-  model:add(nn.ReLU())
-  model:add(nn.Reshape(nclasses))
-  model:add(nn.LogSoftMax())
+  mod = nn.Sequential()
+  mod:add(nn.SpatialConvolutionMM(cdims,nfeats[1],filtsize,filtsize,1,1))
+  mod:add(nn.ReLU())
+  mod:add(nn.SpatialMaxPooling(2,2,2,2))
+  mod:add(nn.Replicate(2)) -- replicate 
+  mod:add(nn.SplitTable(1)) -- put them in two tables because we'll use parallel table
+
+  -- the parallel section
+  mpt = nn.ParallelTable();
+
+  -- first
+  modL1 = nn.Sequential();
+  modL1:add(nn.SpatialMaxPooling(2,2,2,2))
+  modL1:add(nn.Reshape(nfeats[1]*7*7))
+
+  -- second
+  modL2 = nn.Sequential();
+  modL2:add(nn.SpatialConvolutionMM(nfeats[1],nfeats[2],filtsize,filtsize,1,1))
+  modL2:add(nn.ReLU())
+  modL2:add(nn.SpatialMaxPooling(2,2,2,2))
+  modL2:add(nn.Reshape(nfeats[2]*filtsize*filtsize))
+
+  mpt:add(modL2)
+  mpt:add(modL1) -- just identity
+
+  mod:add(mpt) -- second layer
+  mod:add(nn.JoinTable(1)) -- join the tables
+  mod:add(nn.Linear(nfeats[1]*7*7+nfeats[2]*filtsize*filtsize,nfeats[3]))
+  mod:add(nn.Tanh())
+  mod:add(nn.Linear(nfeats[3], nclasses))
+  mod:add(nn.Tanh())
+  mod:add(nn.Reshape(nclasses))
   
   criterion = nn.ClassNLLCriterion()
   learningRate = .001
   maxIt = 5;
 elseif config == 5 then
--- configuration uses saturated tanh + subtractive and divisive normalizations in all conv layers
--- learning rate .01, iterations 5 -- test 84% 
-  require 'nngraph'
   
   print('Configuration 5')
    
   nfeats = {100,200,100}
   filtsize = 5
   nclasses = 43
+    
   model = nn.Sequential()
-  
-  -- first block : convolutional
-  model:add(nn.SpatialContrastiveNormalization(cdims,image.gaussian(5)))
   model:add(nn.SpatialConvolutionMM(cdims,nfeats[1],filtsize,filtsize,1,1))
   model:add(nn.Tanh())
   model:add(nn.ReLU())
   model:add(nn.SpatialSubtractiveNormalization(nfeats[1],kernel_subtractive))
   model:add(nn.SpatialDivisiveNormalization(nfeats[1],kernel_divisive))
-  moduleIn1 = nn.SpatialMaxPooling(2,2,2,2)
-  model:add(moduleIn1)
+  model:add(nn.SpatialMaxPooling(2,2,2,2))
+  model:add(nn.Replicate(2)) -- replicate 
+  model:add(nn.SplitTable(1)) -- put them in two tables because we'll use parallel table
+
+  -- the parallel section
+  mpt = nn.ParallelTable();
+
+  -- first
+  modL1 = nn.Sequential();
+  modL1:add(nn.SpatialMaxPooling(2,2,2,2))
+  modL1:add(nn.Reshape(nfeats[1]*7*7))
+
+  -- second
+  modL2 = nn.Sequential();
+  modL2:add(nn.SpatialConvolutionMM(nfeats[1],nfeats[2],filtsize,filtsize,1,1))
+  modL2:add(nn.ReLU())
+  modL2:add(nn.SpatialMaxPooling(2,2,2,2))
+  modL2:add(nn.Reshape(nfeats[2]*filtsize*filtsize))
+
+  mpt:add(modL2)
+  mpt:add(modL1) -- just identity
+
+  model:add(mpt) -- add the parallel section
+  model:add(nn.JoinTable(1)) -- join the tables
   
-  -- second block : convolutional
-  model:add(nn.SpatialConvolutionMM(nfeats[1],nfeats[2],filtsize,filtsize,1,1))
+  model:add(nn.Linear(nfeats[1]*7*7+nfeats[2]*filtsize*filtsize,nfeats[3]))
   model:add(nn.Tanh())
-  model:add(nn.ReLU())
-  model:add(nn.SpatialSubtractiveNormalization(nfeats[2],kernel_subtractive))
-  model:add(nn.SpatialDivisiveNormalization(nfeats[2],kernel_divisive))
-  moduleIn2 = nn.SpatialMaxPooling(2,2,2,2)
-  
-  -- third block : standard 2-layer neural network
-  moduleOut = nn.Reshape(nfeats[2]*filtsize*filtsize+nfeats[1]*14*14);
-  model:add(nn.gModule({moduleIn1,moduleIn2},{moduleOut}))
-  model:add(nn.Linear(nfeats[2]*filtsize*filtsize,nfeats[3]))
-  model:add(nn.Tanh())
-  model:add(nn.ReLU())
   model:add(nn.Linear(nfeats[3], nclasses))
   model:add(nn.Tanh())
-  model:add(nn.ReLU())
   model:add(nn.Reshape(nclasses))
-  model:add(nn.LogSoftMax())
-  
-  criterion = nn.ClassNLLCriterion()
-  learningRate = .01
-  maxIt = 5;
+
+  criterion = nn.CrossEntropyCriterion()
+
+  learningRate = .003
+  maxIt = 15;
 elseif config == 9 then
   print('Configuration 9')
   model = nn.Sequential()
