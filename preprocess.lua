@@ -43,10 +43,12 @@ else
   -- first download the data
   if not paths.filep('GTSRB_Final_Training_Images.zip') then
     os.execute('wget http://benchmark.ini.rub.de/Dataset/GTSRB_Final_Training_Images.zip')
-    os.execute('unzip GTSRB_Final_Training_Images.zip')
+    os.execute('unzip -qq GTSRB_Final_Training_Images.zip')
     os.execute('wget http://benchmark.ini.rub.de/Dataset/GTSRB_Final_Test_Images.zip')
-    os.execute('unzip GTSRB_Final_Test_Images.zip')
-    os.execute('mv GT-final_test.csv GTSRB')
+    os.execute('unzip -qq GTSRB_Final_Test_Images.zip')
+    os.execute('wget http://benchmark.ini.rub.de/Dataset/GTSRB_Final_Test_GT.zip')
+    os.execute('unzip -qq GTSRB_Final_Test_GT.zip')
+    os.execute('mv GT-final_test.csv GTSRB/')
   end
   
   if color then 

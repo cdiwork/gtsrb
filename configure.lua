@@ -109,7 +109,7 @@ elseif config == 3 then
 -- learning rate .008, iterations 5, FC 100 dims -- test 85%
 -- learning rate .01, iterations 15, FC  50 dims -- test 48% color 
 -- normalized subtractive kernel and removed ReLU from MLP
--- lr = .01, 5 iterations, FC100, test 95% Black and white (BW)
+-- lr = .01, 15 iterations, FC100, test 95% Black and white (BW)
   print('Configuration 3')
    
   nfeats = {100,200,100}
