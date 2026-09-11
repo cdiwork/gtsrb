@@ -4,3 +4,4 @@ __pycache__/
 coach-out/
 demo/analysis.json
 demo/profile.json
+*.egg-info/

@@ -1,9 +1,0 @@
-Metadata-Version: 2.4
-Name: chess-coach
-Version: 0.1.0
-Summary: Analyse your own chess games with Stockfish and find out how you actually lose
-Requires-Python: >=3.9
-Requires-Dist: chess>=1.10
-Requires-Dist: requests>=2.28
-Provides-Extra: dev
-Requires-Dist: pytest>=7; extra == "dev"
