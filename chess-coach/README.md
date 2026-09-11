@@ -203,10 +203,11 @@ Findings need volume: under 10 games the report will tell you not to trust it.
 ## Development
 
 ```bash
-.venv/bin/python -m pytest tests -q        # 59 tests, ~4s
+.venv/bin/python -m pytest tests -q        # 77 tests, ~4s
 ```
 
-The tests worth reading first are in `tests/test_profile.py`: most of them
+A sample of the output (from synthetic engine self-play, see `demo/README.md`)
+lives in `demo/`. The tests worth reading first are in `tests/test_profile.py`: most of them
 assert that a detector stays **silent** on data that only matches its own base
 rate. `tools/simulate.py` generates a synthetic corpus from weakened engine
 self-play for exercising the pipeline end to end.

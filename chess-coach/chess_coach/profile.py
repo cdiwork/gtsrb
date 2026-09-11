@@ -138,6 +138,7 @@ def overview(corpus: Corpus) -> Dict:
         "wins": results.get("win", 0),
         "draws": results.get("draw", 0),
         "losses": results.get("loss", 0),
+        "unfinished": results.get("unknown", 0),
         "as_white": colors.get("white", 0),
         "as_black": colors.get("black", 0),
         "accuracy": corpus.accuracy(),

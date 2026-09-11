@@ -37,7 +37,12 @@ def render_markdown(profile: Dict) -> str:
     hero = profile.get("hero", "you")
     out: List[str] = [f"# Chess weakness profile: {hero}", ""]
 
-    record = f"{overview.get('wins', 0)}W / {overview.get('draws', 0)}D / {overview.get('losses', 0)}L"
+    record = (
+        f"{overview.get('wins', 0)}W / {overview.get('draws', 0)}D / "
+        f"{overview.get('losses', 0)}L"
+    )
+    if overview.get("unfinished"):
+        record += f" / {overview['unfinished']} with no recorded result"
     out += [
         f"**{overview.get('games', 0)} games** ({record}), "
         f"{overview.get('moves_judged', 0)} of your moves judged by Stockfish. "
@@ -89,7 +94,17 @@ def render_markdown(profile: Dict) -> str:
         ],
     )
 
-    out += ["### By how the position stood", ""]
+    out += [
+        "### By how the position stood",
+        "",
+        "One thing to read carefully: accuracy usually *rises* in losing "
+        "positions and that is an artefact, not a skill. Win probability is "
+        "already near zero there, so there is very little left to throw away "
+        "and every move scores well. Compare the `equal`, `better` and "
+        "`winning` rows against each other; ignore `losing` except as a "
+        "reminder of how often you get there.",
+        "",
+    ]
     out += _table(
         ["Position", "Moves", "Accuracy", "Errors/100"],
         [
@@ -478,6 +493,8 @@ def render_html(profile: Dict) -> str:
         f"{overview.get('wins', 0)}W / {overview.get('draws', 0)}D / "
         f"{overview.get('losses', 0)}L"
     )
+    if overview.get("unfinished"):
+        record += f" / {overview['unfinished']} with no recorded result"
     parts.append(f"<h1>How {_e(hero)} loses at chess</h1>")
     parts.append(
         f'<p class="sub">{overview.get("games", 0)} games ({record}), '
@@ -538,8 +555,9 @@ def render_html(profile: Dict) -> str:
     states = profile.get("by_position_state") or {}
     parts.append(_bar_chart(
         "Errors per 100 moves, by how the position stood",
-        "A spike in the 'winning' row means you relax when ahead; a spike in "
-        "'losing' is usually just a lost position.",
+        "Compare winning/better/equal against each other. The 'losing' row "
+        "always looks good and it is an artefact: with win probability near "
+        "zero there is nothing left to throw away, so every move scores well.",
         [(name, row["errors_per_100"]) for name, row in states.items()],
     ))
     time_data = profile.get("time") or {}
