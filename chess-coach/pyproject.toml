@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chess-coach"
+version = "0.1.0"
+description = "Analyse your own chess games with Stockfish and find out how you actually lose"
+requires-python = ">=3.9"
+dependencies = ["chess>=1.10", "requests>=2.28"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7"]
+
+[project.scripts]
+chess-coach = "chess_coach.cli:main"
+
+[tool.setuptools]
+packages = ["chess_coach"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

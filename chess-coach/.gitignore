@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+coach-out/
+demo/analysis.json
+demo/profile.json

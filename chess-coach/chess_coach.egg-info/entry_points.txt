@@ -1,0 +1,2 @@
+[console_scripts]
+chess-coach = chess_coach.cli:main
