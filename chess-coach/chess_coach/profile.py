@@ -961,7 +961,14 @@ def key_moments(corpus: Corpus, limit: int = 10) -> List[Dict]:
     # position that was already lost.
     scored.sort(key=lambda m: -(m["loss"] * (1.0 if m["win_before"] >= 30 else 0.4)))
     out = []
-    for move in scored[:limit]:
+    seen_positions = set()
+    for move in scored:
+        if len(out) >= limit:
+            break
+        # The same position reached twice teaches the same lesson twice.
+        if move["fen_before"] in seen_positions:
+            continue
+        seen_positions.add(move["fen_before"])
         game = move["_game"]
         out.append({
             "game": f"{game['white']} vs {game['black']}",
@@ -1032,13 +1039,7 @@ def build_profile(games: List[Dict], moments: int = 10) -> Dict:
             "or two games each."
         )
 
-    moments = key_moments(corpus, moments)
-    # Drop the back-references before anything tries to serialise the games:
-    # they make the move dicts cyclic.
-    for move in corpus.moves:
-        move.pop("_game", None)
-
-    return {
+    result = {
         "overview": overview(corpus),
         "by_phase": by_bucket(corpus, "phase", ["opening", "middlegame", "endgame"]),
         "by_position_state": by_bucket(
@@ -1052,5 +1053,13 @@ def build_profile(games: List[Dict], moments: int = 10) -> Dict:
         "conversion": conversion(corpus),
         "findings": [asdict(f) for f in findings],
         "caveats": caveats,
-        "key_moments": moments,
+        "key_moments": key_moments(corpus, moments),
     }
+
+    # Only now that every section has been computed: drop the back-references
+    # to the parent games, which would otherwise make the move dicts cyclic
+    # and json.dumps recurse forever. Doing this any earlier breaks whichever
+    # section happens to be evaluated afterwards.
+    for move in corpus.moves:
+        move.pop("_game", None)
+    return result

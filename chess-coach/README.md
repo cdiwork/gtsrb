@@ -56,6 +56,28 @@ Skip the fetch and point `analyse` at the file. `--user` has to match the name
 in the PGN headers exactly enough to identify which side was you —
 case-insensitively.
 
+**Playing on both sites?** Fetch each, concatenate, and pass both handles —
+`--user` is repeatable on `analyse` and `review`, so a mixed corpus works even
+when your names differ:
+
+```bash
+chess-coach fetch --site chess.com --user retsekoj   -o cc.pgn
+chess-coach fetch --site lichess   --user other_name -o li.pgn
+cat cc.pgn li.pgn > games.pgn
+chess-coach analyse games.pgn --user retsekoj --user other_name -o analysis.json
+```
+
+**Just want one game looked at?** That is the common case after a session that
+annoyed you:
+
+```bash
+chess-coach review game.pgn --user YOUR_HANDLE
+```
+
+It prints only the moves that cost something — with the engine's preference,
+the tactic involved and the time you spent — then the three positions worth
+setting up on a board.
+
 Useful flags: `--time-class blitz` (repeatable; bullet is excluded by default),
 `--include-unrated`, `--limit N`, and on Lichess `--token` if you want more than
 the anonymous rate limit allows.

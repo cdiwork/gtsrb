@@ -96,7 +96,8 @@ def cmd_analyse(args: argparse.Namespace) -> int:
             )
     payload = {
         "tool": f"chess-coach {__version__}",
-        "hero": args.user,
+        # --user is repeatable, so collapse the aliases into one display name.
+        "hero": args.user if isinstance(args.user, str) else " / ".join(args.user),
         "games": reports,
         "config": vars(config) if hasattr(config, "__dict__") else {},
         "seconds": round(time.time() - started, 1),
@@ -150,6 +151,30 @@ def cmd_dossier(args: argparse.Namespace) -> int:
         _log(f"wrote {args.out}")
     else:
         print(text)
+    return 0
+
+
+def cmd_review(args: argparse.Namespace) -> int:
+    from .report import render_game_review
+
+    games = _read_games(Path(args.pgn))
+    mine = [g for g in games if hero_color(g, args.user) is not None]
+    if not mine:
+        _log(f"error: no games in {args.pgn} were played by {args.user!r}")
+        return 2
+    config = AnalysisConfig(
+        fast_depth=args.fast_depth, deep_depth=args.deep_depth,
+        multipv=args.multipv, movetime=args.movetime,
+        deep_movetime=args.deep_movetime,
+    )
+    with Analyst(path=args.engine, threads=args.threads, hash_mb=args.hash) as analyst:
+        _log(f"engine: {analyst.id} ({analyst.threads} threads), analysing...")
+        for game in mine[: args.limit]:
+            report = analyse_game(game, args.user, analyst, config)
+            if report is None:
+                continue
+            print(render_game_review(report))
+            print()
     return 0
 
 
@@ -235,7 +260,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     analyse_parser = subs.add_parser("analyse", help="judge every move you played")
     analyse_parser.add_argument("pgn")
-    analyse_parser.add_argument("--user", required=True)
+    analyse_parser.add_argument("--user", required=True, action="append",
+                                help="your handle; repeat it if you use "
+                                     "different names on different sites")
     analyse_parser.add_argument("--limit", type=int, help="only the first N games")
     analyse_parser.add_argument("--multipv", type=int, default=3)
     _add_engine_flags(analyse_parser)
@@ -262,8 +289,20 @@ def build_parser() -> argparse.ArgumentParser:
     dossier_parser.add_argument("-o", "--out")
     dossier_parser.set_defaults(func=cmd_dossier)
 
+    review_parser = subs.add_parser(
+        "review", help="annotate a single game and print it"
+    )
+    review_parser.add_argument("pgn")
+    review_parser.add_argument("--user", required=True, action="append")
+    review_parser.add_argument("--limit", type=int, default=1,
+                               help="how many games from the file (default 1)")
+    review_parser.add_argument("--multipv", type=int, default=3)
+    _add_engine_flags(review_parser)
+    review_parser.set_defaults(func=cmd_review)
+
     coach_parser = subs.add_parser("coach", help="fetch, analyse, profile and report")
-    coach_parser.add_argument("--user", required=True)
+    coach_parser.add_argument("--user", required=True,
+                              help="your handle on the site you are fetching from")
     coach_parser.add_argument("--pgn", help="use this PGN instead of downloading")
     _add_fetch_flags(coach_parser)
     _add_engine_flags(coach_parser)

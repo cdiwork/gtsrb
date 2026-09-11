@@ -100,12 +100,17 @@ def parse_time_control(value: str) -> Tuple[Optional[int], int]:
     return int(match.group(1)), int(match.group(2) or 0)
 
 
-def hero_color(game: chess.pgn.Game, user: str) -> Optional[chess.Color]:
-    """Which side the user played, matched case-insensitively."""
-    target = user.strip().lower()
-    if game.headers.get("White", "").strip().lower() == target:
+def hero_color(game: chess.pgn.Game, user) -> Optional[chess.Color]:
+    """Which side the user played, matched case-insensitively.
+
+    `user` may be several names: people rarely have the same handle on
+    Chess.com and Lichess, and a combined corpus has to work anyway.
+    """
+    names = [user] if isinstance(user, str) else list(user)
+    targets = {n.strip().lower() for n in names if n and n.strip()}
+    if game.headers.get("White", "").strip().lower() in targets:
         return chess.WHITE
-    if game.headers.get("Black", "").strip().lower() == target:
+    if game.headers.get("Black", "").strip().lower() in targets:
         return chess.BLACK
     return None
 
@@ -134,7 +139,7 @@ def _result_for(headers: chess.pgn.Headers, color: chess.Color) -> str:
 
 def analyse_game(
     game: chess.pgn.Game,
-    user: str,
+    user,
     analyst: Analyst,
     config: Optional[AnalysisConfig] = None,
     progress=None,
@@ -258,7 +263,7 @@ def analyse_game(
         "black": game.headers.get("Black", ""),
         "white_elo": game.headers.get("WhiteElo", ""),
         "black_elo": game.headers.get("BlackElo", ""),
-        "hero": user,
+        "hero": game.headers.get("White" if color == chess.WHITE else "Black", ""),
         "hero_color": "white" if color == chess.WHITE else "black",
         "hero_elo": game.headers.get(
             "WhiteElo" if color == chess.WHITE else "BlackElo", ""

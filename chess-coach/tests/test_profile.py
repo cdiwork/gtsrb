@@ -205,3 +205,35 @@ def test_profile_survives_json_round_trip():
     games = [make_game([make_move() for _ in range(20)]) for _ in range(3)]
     profile = build_profile(games)
     assert json.loads(json.dumps(profile))["overview"]["games"] == 3
+
+
+def test_profile_with_clock_data_survives_and_reports_time():
+    """Regression: the cleanup of parent-game back-references used to run
+    before the time analysis that needs them, so any corpus with clocks --
+    which is to say every real one -- crashed."""
+    moves = [
+        make_move(time_spent=1.0 if i % 7 == 0 else 9.0, clock=250 - i * 5,
+                  severity="blunder" if i % 7 == 0 else None,
+                  loss=25.0 if i % 7 == 0 else 1.0,
+                  accuracy=20.0 if i % 7 == 0 else 97.0)
+        for i in range(40)
+    ]
+    profile = build_profile([make_game(list(moves)) for _ in range(10)])
+    assert profile["time"]["by_time_spent"]
+    assert profile["time"]["by_clock_left"]
+    assert profile["overview"]["clock_data"] is True
+    json.dumps(profile)
+
+
+def test_shared_move_dicts_do_not_leak_back_references():
+    """Two games built from the same move objects must still serialise."""
+    shared = [make_move() for _ in range(10)]
+    profile = build_profile([make_game(shared), make_game(shared)])
+    json.dumps(profile)
+
+
+def test_key_moments_do_not_repeat_a_position():
+    moves = [make_move(severity="blunder", loss=25.0, win_before=55.0) for _ in range(6)]
+    profile = build_profile([make_game(moves)])
+    fens = [m["fen"] for m in profile["key_moments"]]
+    assert len(fens) == len(set(fens)) == 1

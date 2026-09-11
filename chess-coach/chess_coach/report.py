@@ -359,7 +359,9 @@ p { margin: 0 0 12px; }
 .lane { display: flex; align-items: center; gap: 8px; }
 .track { flex: 1; background: var(--track); border-radius: 4px; height: 100%; }
 .bar { height: 14px; border-radius: 0 4px 4px 0; background: var(--series-1);
-  min-width: 2px; transition: filter 0.12s; }
+  transition: filter 0.12s; }
+/* A zero value draws nothing: a stub bar reads as a small quantity. */
+.bar:not(.zero) { min-width: 2px; }
 .bar.s2 { background: var(--series-2); }
 .lane:hover .bar { filter: brightness(1.12); }
 .num { font-variant-numeric: tabular-nums; font-size: 0.85rem; color: var(--ink-2);
@@ -432,6 +434,8 @@ def _bar_chart(
                 continue
             width = 100 * float(value) / top
             cls = "bar" if index == 1 else "bar s2"
+            if not float(value):
+                cls += " zero"
             label = f"{value}{suffix}"
             out.append(
                 f'<div class="lane" title="{_e(name)}: {_e(label)}">'
@@ -656,3 +660,80 @@ def render_html(profile: Dict) -> str:
         + "".join(parts)
         + "</div></body></html>"
     )
+
+
+# --------------------------------------------------------------------------
+# Single game review
+# --------------------------------------------------------------------------
+
+_MARK = {"blunder": "??", "mistake": "?", "inaccuracy": "?!"}
+
+
+def render_game_review(report: Dict, width: int = 88) -> str:
+    """A terminal-readable annotation of one game.
+
+    Only the moves that cost something are listed. A full move-by-move dump
+    reads like a log file and hides the three moves that decided the game.
+    """
+    out: List[str] = []
+    header = (
+        f"{report['white']} vs {report['black']}"
+        f"{' (' + report['opening'] + ')' if report.get('opening') else ''}"
+    )
+    out.append(header)
+    out.append("-" * min(width, len(header)))
+    counts = report["counts"]
+    out.append(
+        f"You were {report['hero_color']}, result: {report['result']}. "
+        f"Accuracy {report['accuracy']}%, {report['mean_loss']} win% lost per move."
+    )
+    def plural(count: int, word: str) -> str:
+        return f"{count} {word}{'' if count == 1 else 's'}"
+
+    out.append(
+        f"{plural(counts['blunder'], 'blunder')}, "
+        f"{plural(counts['mistake'], 'mistake')}, "
+        f"{plural(counts['inaccuracy'], 'inaccuracy').replace('inaccuracys', 'inaccuracies')}"
+        f" over {report['moves_analysed']} moves."
+    )
+    out.append("")
+
+    flawed = [m for m in report["moves"] if m.get("severity")]
+    if not flawed:
+        out.append("Nothing above the inaccuracy threshold. Clean game.")
+        return "\n".join(out)
+
+    out.append("Move       Cost   Win%     Engine preferred")
+    for move in flawed:
+        mark = _MARK.get(move["severity"], "")
+        label = f"{move['move_number']}.{'' if move['side'] == 'white' else '..'}{move['san']}{mark}"
+        best = move.get("best_san") or "-"
+        extra = []
+        if move.get("time_spent") is not None:
+            extra.append(f"{move['time_spent']:.0f}s")
+        if move.get("allowed_motifs"):
+            extra.append("allowed " + "/".join(move["allowed_motifs"][:2]))
+        elif move.get("missed_motifs"):
+            extra.append("missed " + "/".join(move["missed_motifs"][:2]))
+        suffix = f"   [{', '.join(extra)}]" if extra else ""
+        out.append(
+            f"{label:<11}{-move['loss']:>6.1f}  "
+            f"{move['win_before']:>4.0f}->{move['win_after']:<4.0f} {best:<8}{suffix}"
+        )
+    out.append("")
+
+    worst = sorted(flawed, key=lambda m: -m["loss"])[:3]
+    out.append("Worth setting up on a board:")
+    for move in worst:
+        out.append("")
+        out.append(
+            f"  Move {move['move_number']} ({move['severity']}, "
+            f"-{move['loss']:.1f} win%): you played {move['san']}, "
+            f"{move.get('best_san') or '?'} was right."
+        )
+        if move.get("best_line_san"):
+            out.append(f"    Engine line: {move['best_line_san']}")
+        if move.get("refutation_san"):
+            out.append(f"    Punished by: {move['refutation_san']}")
+        out.append(f"    {move['fen_before']}")
+    return "\n".join(out)
