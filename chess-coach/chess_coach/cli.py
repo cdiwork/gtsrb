@@ -21,6 +21,42 @@ def _log(message: str) -> None:
     print(message, file=sys.stderr, flush=True)
 
 
+def _names(user) -> str:
+    return user if isinstance(user, str) else " / ".join(user)
+
+
+def _load_corpus(path: Path, user) -> Optional[List[chess.pgn.Game]]:
+    """The user's games from a PGN file, or None after explaining what is wrong.
+
+    Worth being careful here: the two most common bad inputs are a bare FEN
+    (a position, which has no moves to judge) and the wrong handle, and the
+    unhelpful version of this function reports both as "no games found".
+    """
+    games = _read_games(path)
+    playable = [game for game in games if game.next() is not None]
+    if not playable:
+        _log(f"error: {path} contains no games with any moves in them.")
+        if games:
+            _log(
+                "If you pasted a FEN: that is a single position, not a game. "
+                "chess-coach judges the moves that led to a position, so it "
+                "needs the game -- export it as PGN from the site's analysis "
+                "page and pass that."
+            )
+        return None
+    mine = [game for game in playable if hero_color(game, user) is not None]
+    if not mine:
+        present = sorted({
+            game.headers.get(colour, "")
+            for game in playable for colour in ("White", "Black")
+        } - {"", "?"})
+        _log(f"error: nobody called {_names(user)!r} played in {path}.")
+        if present:
+            _log(f"players in that file: {', '.join(present)[:300]}")
+        return None
+    return mine
+
+
 def _read_games(path: Path) -> List[chess.pgn.Game]:
     games = []
     with open(path, encoding="utf-8", errors="replace") as handle:
@@ -57,12 +93,8 @@ def cmd_fetch(args: argparse.Namespace) -> int:
 
 
 def cmd_analyse(args: argparse.Namespace) -> int:
-    games = _read_games(Path(args.pgn))
-    mine = [g for g in games if hero_color(g, args.user) is not None]
-    if not mine:
-        names = sorted({g.headers.get(c, "") for g in games for c in ("White", "Black")})
-        _log(f"error: no games in {args.pgn} were played by {args.user!r}.")
-        _log(f"players present: {', '.join(n for n in names if n)[:300]}")
+    mine = _load_corpus(Path(args.pgn), args.user)
+    if mine is None:
         return 2
     if args.limit:
         mine = mine[: args.limit]
@@ -157,10 +189,8 @@ def cmd_dossier(args: argparse.Namespace) -> int:
 def cmd_review(args: argparse.Namespace) -> int:
     from .report import render_game_review
 
-    games = _read_games(Path(args.pgn))
-    mine = [g for g in games if hero_color(g, args.user) is not None]
-    if not mine:
-        _log(f"error: no games in {args.pgn} were played by {args.user!r}")
+    mine = _load_corpus(Path(args.pgn), args.user)
+    if mine is None:
         return 2
     config = AnalysisConfig(
         fast_depth=args.fast_depth, deep_depth=args.deep_depth,
@@ -172,6 +202,7 @@ def cmd_review(args: argparse.Namespace) -> int:
         for game in mine[: args.limit]:
             report = analyse_game(game, args.user, analyst, config)
             if report is None:
+                _log("skipped a game with no moves to judge")
                 continue
             print(render_game_review(report))
             print()
