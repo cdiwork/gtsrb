@@ -27,17 +27,33 @@ do. For each position below, write:
 2. **Why the played move is wrong in terms of that plan** -- not "it loses a
    knight" (the evaluation already says so) but which feature of the position
    it misunderstood.
-3. **What the player probably saw and did not see.** Be concrete and use the
-   evidence given: the clock time, whether the refutation was a check or
-   capture, whether the move they missed was quiet or backward.
+3. **What it would have taken to find the better move.** Be concrete: how many
+   forcing replies were there to look at, was the move that refutes it a
+   capture, was the better move quiet or backward, how long did they spend.
 
 Then, across all the positions, name the recurring habit in one paragraph and
 give one drill that would actually address it.
 
-Rules: do not paraphrase engine lines as if they were insight. Do not give
-advice that would be true of any position ("develop your pieces", "control
-the centre") unless it is specifically the point here. If the positions do
-not share a pattern, say so -- a profile of one honest observation is worth
+## The rule that matters most
+
+**An engine cannot tell a blunder from a plan from a hunch, and those three
+need completely different fixes.** The same -18 win% is produced by a player
+who never looked, a player who calculated a line and got it wrong, and a
+player who had a correct instinct and never verified it. Nothing in the data
+below distinguishes them.
+
+So do not write "the player probably saw..." as though it were a finding. Ask
+the player what they were trying to do, and say plainly that your reading is
+provisional until they answer. Each position has a slot for their account;
+when it is empty, the honest output is an explanation of the chess plus a
+question, not a confident diagnosis of their thinking. When it is filled in,
+that testimony outranks your inference -- rebuild the explanation around it
+rather than defending the first reading.
+
+Other rules: do not paraphrase engine lines as if they were insight. Do not
+give advice that would be true of any position ("develop your pieces",
+"control the centre") unless it is specifically the point here. If the
+positions do not share a pattern, say so -- one honest observation is worth
 more than five invented ones.
 """
 
@@ -140,6 +156,10 @@ def render_dossier(profile: Dict, limit: int = 6) -> str:
             out.append(f"- The move played was: {', '.join(moment['shape_tags'])}")
         if moment.get("time_spent") is not None:
             out.append(f"- Time spent on it: {moment['time_spent']}s")
+        out.append(
+            "- **What the player says they were thinking:** _(unanswered -- "
+            "ask before diagnosing)_"
+        )
         if moment.get("only_move"):
             out.append("- There was only one good move here")
         elif moment.get("complexity") is not None:

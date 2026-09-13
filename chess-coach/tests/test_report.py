@@ -55,3 +55,25 @@ def test_legend_names_every_arrow_colour():
     html = legend_html()
     for label in ("what you played", "what was better"):
         assert label in html
+
+
+def test_dossier_refuses_to_let_intent_be_guessed():
+    """An engine cannot tell a blunder from a plan from a hunch. The brief has
+    to say so, or the reader will confidently invent the player's reasoning."""
+    from chess_coach.dossier import render_dossier
+    text = render_dossier({
+        "hero": "someone",
+        "overview": {"games": 1, "moves_judged": 40, "accuracy": 93.3},
+        "findings": [], "motifs": {}, "key_moments": [{
+            "game": "a vs b", "opening": "Italian", "hero_color": "white",
+            "move_number": 8, "played": "Nxe5", "best": "Bxe5",
+            "best_line": "", "refutation": "", "loss": 19.3,
+            "win_before": 61.0, "win_after": 42.0, "severity": "mistake",
+            "phase": "opening", "fen": "8/8/8/8/8/8/8/K6k w - - 0 1",
+            "time_spent": 12.0, "missed_motifs": [], "allowed_motifs": [],
+            "shape_tags": [], "structure": None, "complexity": 14.7,
+        }],
+    })
+    assert "blunder from a plan from a hunch" in text
+    assert "ask before diagnosing" in text
+    assert "testimony outranks your inference" in text
