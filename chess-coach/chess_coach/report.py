@@ -270,6 +270,8 @@ def _counter_line(counter: Optional[Dict]) -> str:
 import html as _html
 from urllib.parse import quote as _quote
 
+from .diagram import board_svg, legend_html
+
 _CSS = """
 :root {
   color-scheme: light;
@@ -385,6 +387,10 @@ p { margin: 0 0 12px; }
   color: var(--ink-2); }
 .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px;
   margin-right: 5px; vertical-align: baseline; }
+.board { margin: 12px 0; max-width: 340px; }
+.board svg { width: 100%; height: auto; display: block; border-radius: 4px; }
+.legend-item { display: inline-flex; align-items: center; gap: 6px; }
+.legend-arrow { display: inline-block; width: 16px; height: 4px; border-radius: 2px; }
 .tablewrap { overflow-x: auto; }
 table { border-collapse: collapse; width: 100%; font-size: 0.88rem; }
 th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid var(--grid); }
@@ -633,14 +639,25 @@ def render_html(profile: Dict) -> str:
     if moments:
         parts.append("<h2>The positions worth studying</h2>")
         parts.append(
-            "<p>Find the move before you read the answer. Each board link opens "
-            "the position in an analysis board.</p>"
+            "<p>Find the move before you read the answer. Boards are drawn from "
+            "the side you were playing.</p>"
         )
+        parts.append(legend_html())
         for index, moment in enumerate(moments, 1):
             link = "https://lichess.org/analysis/" + _quote(moment["fen"], safe="")
             tags = ", ".join(
                 (moment.get("missed_motifs") or []) + (moment.get("allowed_motifs") or [])
             )
+            try:
+                board = board_svg(
+                    moment["fen"],
+                    played=moment.get("played"),
+                    better=moment.get("best"),
+                    orientation=moment.get("hero_color") != "black",
+                    size=320,
+                )
+            except Exception:
+                board = ""
             parts.append(
                 f'<div class="pos"><div class="head">'
                 f"<strong>{index}. Move {_e(moment['move_number'])} as "
@@ -657,6 +674,7 @@ def render_html(profile: Dict) -> str:
                 + "</p>"
                 + (f"<p>Punished by: {_e(moment['refutation'])}</p>"
                    if moment.get("refutation") else "")
+                + (f'<div class="board">{board}</div>' if board else "")
                 + f'<p><span class="fen">{_e(moment["fen"])}</span> '
                 f'<a href="{_e(link)}" target="_blank" rel="noopener">open board</a></p>'
                 "</div>"
