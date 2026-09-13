@@ -82,6 +82,32 @@ Useful flags: `--time-class blitz` (repeatable; bullet is excluded by default),
 `--include-unrated`, `--limit N`, and on Lichess `--token` if you want more than
 the anonymous rate limit allows.
 
+### The other report: what was fun
+
+```bash
+chess-coach tricks analysis.json --html tricks.html
+```
+
+The rest of this tool asks what you got wrong and what it cost. `tricks` asks
+a different question, and for a lot of players a better one: **what were the
+fun moves on the board, and did you find them?** It reports the pretty moves
+you played, the pretty moves you walked past, and the sacrifices that didn't
+come off — ranked by how good the move would have felt rather than by
+centipawns.
+
+Beauty is scored from the features a human points at when calling a move
+pretty: material given up, whether the move is quiet rather than forcing,
+whether it moves backwards, which motifs fire, whether it was the only move
+that worked. Taking a hanging queen scores near zero; a quiet move that wins
+scores a lot. The scoring is a taste judgement made explicit in
+`MOTIF_BEAUTY` and `SAC_TIERS` so you can disagree with it and edit it.
+
+Crucially it gates on content: a move needs a sacrifice, a motif, or to be
+the only move, before quietness earns it anything. Without that gate every
+developing move in the database scores as a brilliancy.
+
+It runs on an existing `analysis.json` and needs no engine.
+
 ### Then ask for the plans
 
 ```bash
@@ -183,6 +209,7 @@ Findings need volume: under 10 games the report will tell you not to trust it.
 | `analysis.json` | every move you played, judged, with motifs and context |
 | `profile.json` | the aggregates, the findings, the key positions |
 | `report.html` | the readable report — theme-aware, works on a phone |
+| `tricks.html` | the fun report: pretty moves found and missed, with boards |
 | `report.md` | the same thing as Markdown |
 | `dossier.md` | key positions packaged for a coach or an LLM |
 
@@ -203,7 +230,7 @@ Findings need volume: under 10 games the report will tell you not to trust it.
 ## Development
 
 ```bash
-.venv/bin/python -m pytest tests -q        # 77 tests, ~4s
+.venv/bin/python -m pytest tests -q        # 102 tests, ~5s
 ```
 
 A sample of the output (from synthetic engine self-play, see `demo/README.md`)
@@ -222,4 +249,6 @@ self-play for exercising the pipeline end to end.
 | `analyse.py` | one game → judged moves with context |
 | `profile.py` | many games → aggregates, base rates, findings |
 | `report.py` | Markdown and HTML rendering |
+| `tricks.py` | scoring moves for prettiness rather than correctness |
+| `diagram.py` | drawing annotated boards |
 | `dossier.py` | key positions packaged for explanation |

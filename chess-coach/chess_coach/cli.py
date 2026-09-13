@@ -209,6 +209,26 @@ def cmd_review(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_tricks(args: argparse.Namespace) -> int:
+    from .tricks import find_tricks, render_tricks
+
+    data = _load_analysis(args.analysis)
+    report = find_tricks(data["games"], min_beauty=args.min_beauty)
+    report["hero"] = data.get("hero", "")
+    if args.json:
+        Path(args.json).write_text(json.dumps(report, indent=1), encoding="utf-8")
+        _log(f"wrote {args.json}")
+    if args.html:
+        from .tricks_html import render_tricks_html
+
+        Path(args.html).write_text(render_tricks_html(report, limit=args.limit),
+                                   encoding="utf-8")
+        _log(f"wrote {args.html}")
+    if not (args.json or args.html):
+        print(render_tricks(report, limit=args.limit))
+    return 0
+
+
 def cmd_coach(args: argparse.Namespace) -> int:
     """fetch -> analyse -> profile -> report, in one go."""
     workdir = Path(args.workdir)
@@ -330,6 +350,17 @@ def build_parser() -> argparse.ArgumentParser:
     review_parser.add_argument("--multipv", type=int, default=3)
     _add_engine_flags(review_parser)
     review_parser.set_defaults(func=cmd_review)
+
+    tricks_parser = subs.add_parser(
+        "tricks", help="the fun report: pretty moves you found and missed"
+    )
+    tricks_parser.add_argument("analysis")
+    tricks_parser.add_argument("--limit", type=int, default=8,
+                               help="how many of each to show")
+    tricks_parser.add_argument("--min-beauty", type=int, default=16)
+    tricks_parser.add_argument("--html", help="render with boards")
+    tricks_parser.add_argument("--json")
+    tricks_parser.set_defaults(func=cmd_tricks)
 
     coach_parser = subs.add_parser("coach", help="fetch, analyse, profile and report")
     coach_parser.add_argument("--user", required=True,
