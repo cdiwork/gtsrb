@@ -272,3 +272,51 @@ def test_pawn_blindness_stays_quiet_at_the_base_rate():
 def test_pawn_blindness_needs_a_sample():
     profile = build_profile([_pawn_game(4, 1)])
     assert _finding(profile, "pawn_moves") is None
+
+
+# A middlegame position with a black king castled kingside and a white queen
+# that can swing to h5 among many other moves.
+SWING = "r1bq1rk1/ppp2ppp/2n5/3np3/2B5/3P1N2/PPP2PPP/RNBQ1RK1 w - - 0 1"
+
+
+def _swing_game(n_swing_best, n_other_best):
+    moves = []
+    for _ in range(n_swing_best):
+        moves.append(make_move(fen_before=SWING, san="Nc3", best_san="Qd2",
+                               severity="mistake", loss=13.0, accuracy=50.0))
+    for _ in range(n_other_best):
+        moves.append(make_move(fen_before=SWING, san="Nc3", best_san="a3",
+                               severity="mistake", loss=13.0, accuracy=50.0))
+    return make_game(moves)
+
+
+def test_queen_swing_detector_needs_a_real_excess():
+    """Two or three swings among many misses is the base rate, not a habit."""
+    profile = build_profile([_swing_game(2, 16)])
+    assert _finding(profile, "queen_swing") is None
+
+
+def test_queen_swing_detector_needs_a_sample():
+    profile = build_profile([_swing_game(6, 2)])
+    # 8 mistakes is below the floor regardless of how lopsided it looks.
+    assert _finding(profile, "queen_swing") is None
+
+
+def test_queen_swing_is_not_the_same_as_any_queen_move():
+    """The point is the square she arrives on, not that she moved.
+
+    Qd2 eyes h6 and counts; Qe2 is just as much a queen move and reaches
+    nothing near the king, so it must not.
+    """
+    import chess
+    from chess_coach.profile import _is_queen_swing
+    board = chess.Board(SWING)
+    assert _is_queen_swing(board, board.parse_san("Qd2")) is True
+    assert _is_queen_swing(board, board.parse_san("Qe2")) is False
+    assert _is_queen_swing(board, board.parse_san("Nc3")) is False
+
+
+def test_queen_swing_fires_on_a_real_excess():
+    profile = build_profile([_swing_game(14, 4)])
+    found = _finding(profile, "queen_swing")
+    assert found is not None and found["numbers"]["lift"] > 1.5

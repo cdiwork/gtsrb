@@ -936,6 +936,100 @@ def detect_pawn_move_blindness(corpus: Corpus) -> Optional[Finding]:
     )
 
 
+def _king_zone(board: chess.Board, colour: chess.Color) -> chess.SquareSet:
+    """The enemy king and the ring of squares around it, two deep."""
+    king = board.king(colour)
+    if king is None:
+        return chess.SquareSet()
+    file_idx, rank = chess.square_file(king), chess.square_rank(king)
+    return chess.SquareSet(
+        chess.square(f, r)
+        for f in range(max(0, file_idx - 2), min(8, file_idx + 3))
+        for r in range(max(0, rank - 2), min(8, rank + 3))
+    )
+
+
+def _is_queen_swing(board: chess.Board, move: chess.Move) -> bool:
+    """A queen move that brings more fire to bear on the enemy king."""
+    piece = board.piece_at(move.from_square)
+    if piece is None or piece.piece_type != chess.QUEEN:
+        return False
+    zone = _king_zone(board, not board.turn)
+    if not zone:
+        return False
+    before = len(board.attacks(move.from_square) & zone)
+    after = board.copy(stack=False)
+    after.push(move)
+    return len(after.attacks(move.to_square) & zone) > before
+
+
+def detect_queen_swing_blindness(corpus: Corpus) -> Optional[Finding]:
+    """Do you miss the queen relocating into an attack on the king?
+
+    Deliberately not "do you fear losing your queen" -- that was tested on
+    this tool's first real corpus and came out flat, at the base rate. What
+    is *not* flat is the queen lift: Qd1-h5, Qg4-h7, the move that captures
+    nothing and threatens nothing yet, and whose whole point is the square
+    it arrives on.
+    """
+    pool = [m for m in corpus.errors if m.get("best_san") and m.get("fen_before")]
+    if len(pool) < 12:
+        return None
+    hits = counted = 0
+    expected = []
+    for record in pool:
+        try:
+            board = chess.Board(record["fen_before"])
+            move = board.parse_san(record["best_san"])
+        except Exception:
+            continue
+        counted += 1
+        hits += _is_queen_swing(board, move)
+        legal = list(board.legal_moves)
+        if legal:
+            expected.append(
+                sum(1 for m in legal if _is_queen_swing(board, m)) / len(legal)
+            )
+    if counted < 12 or not expected:
+        return None
+    base = statistics.mean(expected)
+    observed = hits / counted
+    lift = observed / base if base > 0 else 0.0
+    if lift < 1.5 or hits < 6:
+        return None
+    return Finding(
+        key="queen_swing",
+        title="The queen lift doesn't occur to you",
+        definition=(
+            "A candidate-generation gap rather than a nerve problem. The "
+            "queen swinging to the enemy king -- Qh5, Qh4, Qh7 -- captures "
+            "nothing and threatens nothing on arrival; the whole point is "
+            "the square it reaches. Moves whose value is positional rather "
+            "than immediate are the hardest kind to think of at all."
+        ),
+        signal=(
+            "Share of the best moves you missed that were queen moves "
+            "bringing new attack onto the enemy king's zone, against how "
+            "often such moves were available."
+        ),
+        evidence=(
+            f"{hits} of {counted} missed best moves ({observed:.0%}) were "
+            f"queen swings at the king, against a {base:.0%} base rate "
+            f"({lift:.2f}x)."
+        ),
+        n=counted,
+        strength=_strength(counted, lift),
+        drill=(
+            "When their king is castled and you still have a queen, trace "
+            "her route to h4, h5 and h7 before you look at anything else. "
+            "It is one specific board pattern, not a general principle, and "
+            "it is cheap to check."
+        ),
+        numbers={"hits": hits, "n": counted, "observed": round(observed, 3),
+                 "expected": round(base, 3), "lift": round(lift, 2)},
+    )
+
+
 def detect_phase_gap(corpus: Corpus) -> Optional[Finding]:
     """Which third of the game costs you most?"""
     phases = by_bucket(corpus, "phase", ["opening", "middlegame", "endgame"])
@@ -1040,6 +1134,7 @@ DETECTORS = (
     detect_plan_persistence,
     detect_king_safety_neglect,
     detect_pawn_move_blindness,
+    detect_queen_swing_blindness,
     detect_phase_gap,
     detect_opening_cliff,
 )
