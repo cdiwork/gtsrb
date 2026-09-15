@@ -16,7 +16,9 @@ def make_move(**kwargs):
         "side": kwargs.get("side", "white"),
         "san": kwargs.get("san", "Nf3"),
         "uci": "g1f3",
-        "fen_before": "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1",
+        "fen_before": kwargs.get(
+            "fen_before", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w - - 0 1"
+        ),
         "win_before": kwargs.get("win_before", 50.0),
         "win_after": kwargs.get("win_after", 50.0),
         "loss": kwargs.get("loss", 0.0),
@@ -237,3 +239,36 @@ def test_key_moments_do_not_repeat_a_position():
     profile = build_profile([make_game(moves)])
     fens = [m["fen"] for m in profile["key_moments"]]
     assert len(fens) == len(set(fens)) == 1
+
+
+def _pawn_game(n_pawn_best, n_piece_best):
+    """Positions where the best move is a pawn push or a piece move."""
+    # A position with a healthy mix of pawn and piece moves available.
+    fen = "r1bqkb1r/pppp1ppp/2n2n2/4p3/2B1P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1"
+    moves = []
+    for _ in range(n_pawn_best):
+        moves.append(make_move(fen_before=fen, san="Nc3", best_san="d3",
+                               severity="mistake", loss=13.0, accuracy=50.0))
+    for _ in range(n_piece_best):
+        moves.append(make_move(fen_before=fen, san="Nc3", best_san="Ng5",
+                               severity="mistake", loss=13.0, accuracy=50.0))
+    return make_game(moves)
+
+
+def test_pawn_blindness_fires_when_pawn_moves_dominate_the_misses():
+    profile = build_profile([_pawn_game(16, 2)])
+    found = _finding(profile, "pawn_moves")
+    assert found is not None
+    assert found["numbers"]["lift"] > 1.3
+
+
+def test_pawn_blindness_stays_quiet_at_the_base_rate():
+    """Roughly a quarter of legal moves are pawn moves in that position, so a
+    quarter of the misses being pawn moves is no finding at all."""
+    profile = build_profile([_pawn_game(4, 14)])
+    assert _finding(profile, "pawn_moves") is None
+
+
+def test_pawn_blindness_needs_a_sample():
+    profile = build_profile([_pawn_game(4, 1)])
+    assert _finding(profile, "pawn_moves") is None

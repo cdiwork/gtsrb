@@ -18,6 +18,8 @@ from __future__ import annotations
 
 import statistics
 from collections import Counter, defaultdict
+
+import chess
 from dataclasses import dataclass, asdict, field
 from typing import Dict, Iterable, List, Optional, Tuple
 
@@ -841,6 +843,99 @@ def detect_king_safety_neglect(corpus: Corpus) -> Optional[Finding]:
     )
 
 
+def _pawn_move(fen: str, san: str) -> Optional[bool]:
+    """Was `san` a pawn move in `fen`? None when it cannot be parsed."""
+    try:
+        board = chess.Board(fen)
+        move = board.parse_san(san)
+        piece = board.piece_at(move.from_square)
+        return piece is not None and piece.piece_type == chess.PAWN
+    except Exception:
+        return None
+
+
+def _pawn_share(fen: str) -> Optional[float]:
+    """What fraction of the legal moves here are pawn moves."""
+    try:
+        board = chess.Board(fen)
+        legal = list(board.legal_moves)
+        if not legal:
+            return None
+        pawns = sum(
+            1 for m in legal
+            if (p := board.piece_at(m.from_square)) and p.piece_type == chess.PAWN
+        )
+        return pawns / len(legal)
+    except Exception:
+        return None
+
+
+def detect_pawn_move_blindness(corpus: Corpus) -> Optional[Finding]:
+    """Are the moves you miss disproportionately *pawn* moves?
+
+    Worth separating from the piece tactics. Pawn decisions are different in
+    kind: they are irreversible, they are usually about structure rather than
+    a concrete threat, and they are the moves that decide balanced positions.
+    Computed from the position rather than from stored tags, so it also works
+    on analyses recorded before this detector existed.
+    """
+    pool = [
+        m for m in corpus.errors
+        if m.get("best_san") and m.get("fen_before")
+    ]
+    if len(pool) < 12:
+        return None
+    hits = 0
+    counted = 0
+    expected = []
+    for move in pool:
+        is_pawn = _pawn_move(move["fen_before"], move["best_san"])
+        if is_pawn is None:
+            continue
+        counted += 1
+        hits += is_pawn
+        share = _pawn_share(move["fen_before"])
+        if share is not None:
+            expected.append(share)
+    if counted < 12 or not expected:
+        return None
+    observed = hits / counted
+    base = statistics.mean(expected)
+    lift = observed / base if base > 0 else 0.0
+    if lift < 1.3 or hits < 8:
+        return None
+    return Finding(
+        key="pawn_moves",
+        title="Pawn moves are where you go wrong",
+        definition=(
+            "Not a tactical gap. Pawn moves are irreversible and are usually "
+            "about structure rather than a concrete threat, so they are judged "
+            "rather than calculated -- and judgement is the slower thing to "
+            "build. They are also what decides balanced positions, which is "
+            "where the rest of your errors live."
+        ),
+        signal=(
+            "Share of the best moves you missed that were pawn moves, against "
+            "the share of pawn moves available in those same positions."
+        ),
+        evidence=(
+            f"{hits} of {counted} missed best moves ({observed:.0%}) were pawn "
+            f"moves, against a {base:.0%} base rate ({lift:.2f}x)."
+        ),
+        n=counted,
+        strength=_strength(counted, lift),
+        drill=(
+            "In any position where nothing is forced, ask what your pawns "
+            "should be doing before you ask what your pieces should be doing. "
+            "Name the break you are playing for and the wing it is on -- that "
+            "one question covers the pawn push you keep not making and the "
+            "wrong-wing break in equal measure."
+        ),
+        numbers={"hits": hits, "n": counted, "observed": round(observed, 3),
+                 "expected": round(base, 3), "lift": round(lift, 2)},
+    )
+
+
 def detect_phase_gap(corpus: Corpus) -> Optional[Finding]:
     """Which third of the game costs you most?"""
     phases = by_bucket(corpus, "phase", ["opening", "middlegame", "endgame"])
@@ -944,6 +1039,7 @@ DETECTORS = (
     detect_time_trouble,
     detect_plan_persistence,
     detect_king_safety_neglect,
+    detect_pawn_move_blindness,
     detect_phase_gap,
     detect_opening_cliff,
 )
