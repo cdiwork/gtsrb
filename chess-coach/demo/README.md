@@ -1,13 +1,9 @@
-# Demo corpora
+# Demo corpus — synthetic, not a real player
 
-Two of them, and the difference matters.
-
-- **`games.pgn` here** is synthetic engine self-play. It exercises the pipeline
-  and doubles as a negative control.
-- **[`real/`](real/)** is fourteen actual blitz games plus a context file, and
-  is the worked example for `profile --context`.
-
-## This corpus — synthetic, not a real player
+Nothing in this directory is anybody's real games, and nothing real belongs
+here: this repository is public, and a PGN alongside a context file records
+when a person was awake and at their computer. Point the tool at your own
+games locally and keep the output out of version control.
 
 `games.pgn` is **engine self-play**, not anybody's games: two deliberately
 weakened Stockfish instances (Skill Level 3 vs 4) playing out of real opening

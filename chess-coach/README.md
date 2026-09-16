@@ -261,10 +261,9 @@ Findings need volume: under 10 games the report will tell you not to trust it.
 ```
 
 A sample of the output lives in `demo/` (synthetic engine self-play, see
-`demo/README.md`). `demo/real/` holds fourteen actual blitz games with a
-context file, as the worked example for `profile --context` — and as a
-reminder that on that corpus the strongest finding by a wide margin was not a
-chess habit at all but the time of day.
+`demo/README.md`). Real games are deliberately not committed: a PGN plus a
+context file is a record of when somebody was awake, and this repository is
+public.
 
 The tests worth reading first are in `tests/test_profile.py`: most of them
 assert that a detector stays **silent** on data that only matches its own base

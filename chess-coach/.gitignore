@@ -5,3 +5,10 @@ coach-out/
 demo/analysis.json
 demo/profile.json
 *.egg-info/
+
+# Real games and anything derived from them. This repository is public, and a
+# PGN next to a context file is a record of when somebody was awake.
+demo/real/
+*.pgn
+!demo/games.pgn
+context*.csv
