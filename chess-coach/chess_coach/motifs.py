@@ -187,14 +187,34 @@ def detect_fork(board: chess.Board, move: chess.Move) -> Optional[Dict]:
     }
 
 
+def _lines_held(board: chess.Board, color: bool) -> set:
+    """Every (front, back) pair `color`'s sliders already have lined up.
+
+    Used to tell a pin that a move *creates* from one that was already
+    standing. Without this a queen shuffling around a lone enemy knight
+    scores a fresh "absolute pin" on every move of a long endgame.
+    """
+    held = set()
+    for piece_type in (chess.BISHOP, chess.ROOK, chess.QUEEN):
+        for square in board.pieces(piece_type, color):
+            for df, dr in _slider_dirs(piece_type):
+                found = _scan(board, square, df, dr)
+                if len(found) == 2:
+                    (sq_a, piece_a), (sq_b, piece_b) = found
+                    if piece_a.color != color and piece_b.color != color:
+                        held.add((sq_a, sq_b))
+    return held
+
+
 def detect_pin_or_skewer(board: chess.Board, move: chess.Move) -> Optional[Dict]:
-    """A slider lining up two enemy pieces after `move`."""
+    """A slider lining up two enemy pieces that were not lined up before."""
     mover = board.turn
     after = board.copy(stack=False)
     after.push(move)
     piece = after.piece_at(move.to_square)
     if piece is None:
         return None
+    already = _lines_held(board, mover)
     for df, dr in _slider_dirs(piece.piece_type):
         found = _scan(after, move.to_square, df, dr)
         if len(found) != 2:
@@ -202,6 +222,8 @@ def detect_pin_or_skewer(board: chess.Board, move: chess.Move) -> Optional[Dict]
         (sq_a, piece_a), (sq_b, piece_b) = found
         if piece_a.color == mover or piece_b.color == mover:
             continue
+        if (sq_a, sq_b) in already:
+            continue  # the line was already there; this move did not make it
         front, back = value_of(piece_a), value_of(piece_b)
         if piece_b.piece_type == chess.KING:
             motif = "absolute_pin"

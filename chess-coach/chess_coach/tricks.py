@@ -177,6 +177,23 @@ def beauty_score(
     return score, reasons, motifs, sacrificed
 
 
+# Above this win percentage the position is already won, and an ordinary good
+# move is not a trick anybody had to find. Without this guard a long endgame of
+# queen-chases-knight scores a "trick" on nearly every move, and a game is
+# rewarded for going on a long time rather than for containing anything.
+WON_ENOUGH = 90.0
+
+
+def _worth_finding(move: Dict, san: str, sacrificed: int,
+                   line: str = "") -> bool:
+    """Was there actually something to find here?"""
+    win_before = move.get("win_before")
+    if win_before is None or win_before < WON_ENOUGH:
+        return True
+    # In a won position only the finish counts: mate, or a real sacrifice.
+    return san.endswith("#") or "#" in (line or "") or sacrificed >= 90
+
+
 def find_tricks(games: List[Dict], min_beauty: int = 16) -> Dict:
     """Sort every judged move into found, missed, and didn't-come-off.
 
@@ -207,7 +224,8 @@ def find_tricks(games: List[Dict], min_beauty: int = 16) -> Dict:
                 fen, move["san"], only_move=only_move
             )
             grade = grade_of(score)
-            if grade and loss < 5.0:
+            if grade and loss < 5.0 and _worth_finding(move, move["san"],
+                                                       sacrificed):
                 played.append(Trick(
                     kind="played", **common, move_number=move["move_number"],
                     side=move["side"], fen=fen, san=move["san"], beauty=score,
@@ -232,7 +250,8 @@ def find_tricks(games: List[Dict], min_beauty: int = 16) -> Dict:
                 extra_motifs=move.get("missed_motifs"),
             )
             grade = grade_of(score)
-            if grade:
+            if grade and _worth_finding(move, best, sacrificed,
+                                        move.get("best_line_san") or ""):
                 missed.append(Trick(
                     kind="missed", **common, move_number=move["move_number"],
                     side=move["side"], fen=fen, san=best, beauty=score,

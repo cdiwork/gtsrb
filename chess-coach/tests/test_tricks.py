@@ -95,3 +95,46 @@ def test_a_missed_trick_records_what_was_played_instead():
         missed_motifs=["removal_of_the_guard"])])])
     assert report["counts"]["missed"] == 1
     assert report["missed"][0]["instead_of"] == "Bb3"
+
+
+def _move(**kw):
+    base = {
+        "move_number": 20, "side": "white", "san": kw.pop("san", "Qg5"),
+        "fen_before": kw.pop("fen_before",
+                             "3kq3/4n3/8/8/8/8/8/2B1K3 w - - 0 1"),
+        "loss": 0.0, "only_move": False, "best_san": "Bg5",
+        "best_line_san": "", "win_before": 50.0,
+    }
+    base.update(kw)
+    return base
+
+
+def _corpus(moves):
+    return [{"white": "hero", "black": "foe", "date": "", "opening": "",
+             "moves": moves}]
+
+
+def test_a_good_move_in_a_dead_won_position_is_not_a_trick_you_found():
+    """Queen chases knight for thirty moves: nothing there to find."""
+    move = _move(san="Bg5", win_before=99.0)
+    assert find_tricks(_corpus([move]))["counts"]["found"] == 0
+
+
+def test_the_same_move_counts_when_the_game_is_still_live():
+    move = _move(san="Bg5", win_before=60.0)
+    assert find_tricks(_corpus([move]))["counts"]["found"] == 1
+
+
+def test_a_mate_still_counts_in_a_won_position():
+    move = _move(san="Ra8#", win_before=100.0,
+                 fen_before="6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1")
+    assert find_tricks(_corpus([move]))["counts"]["found"] == 1
+
+
+def test_a_missed_forced_mate_still_counts_in_a_won_position():
+    """The whole point of a won position is the finish, so missing a mate
+    there is exactly the thing worth reporting."""
+    move = _move(san="Rb1", win_before=100.0, loss=9.0,
+                 fen_before="6k1/5ppp/8/8/8/8/8/R5K1 w - - 0 1",
+                 best_san="Ra8#", best_line_san="1. Ra8#")
+    assert find_tricks(_corpus([move]))["counts"]["missed"] == 1
