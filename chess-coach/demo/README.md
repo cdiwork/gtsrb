@@ -1,4 +1,13 @@
-# Demo corpus — synthetic, not a real player
+# Demo corpora
+
+Two of them, and the difference matters.
+
+- **`games.pgn` here** is synthetic engine self-play. It exercises the pipeline
+  and doubles as a negative control.
+- **[`real/`](real/)** is fourteen actual blitz games plus a context file, and
+  is the worked example for `profile --context`.
+
+## This corpus — synthetic, not a real player
 
 `games.pgn` is **engine self-play**, not anybody's games: two deliberately
 weakened Stockfish instances (Skill Level 3 vs 4) playing out of real opening

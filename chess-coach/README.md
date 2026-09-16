@@ -257,11 +257,16 @@ Findings need volume: under 10 games the report will tell you not to trust it.
 ## Development
 
 ```bash
-.venv/bin/python -m pytest tests -q        # 102 tests, ~5s
+.venv/bin/python -m pytest tests -q        # 127 tests, ~3s
 ```
 
-A sample of the output (from synthetic engine self-play, see `demo/README.md`)
-lives in `demo/`. The tests worth reading first are in `tests/test_profile.py`: most of them
+A sample of the output lives in `demo/` (synthetic engine self-play, see
+`demo/README.md`). `demo/real/` holds fourteen actual blitz games with a
+context file, as the worked example for `profile --context` — and as a
+reminder that on that corpus the strongest finding by a wide margin was not a
+chess habit at all but the time of day.
+
+The tests worth reading first are in `tests/test_profile.py`: most of them
 assert that a detector stays **silent** on data that only matches its own base
 rate. `tools/simulate.py` generates a synthetic corpus from weakened engine
 self-play for exercising the pipeline end to end.

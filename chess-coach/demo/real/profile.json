@@ -1,0 +1,1355 @@
+{
+ "overview": {
+  "games": 14,
+  "moves_judged": 517,
+  "wins": 8,
+  "draws": 1,
+  "losses": 5,
+  "unfinished": 0,
+  "as_white": 7,
+  "as_black": 7,
+  "accuracy": 91.08,
+  "mean_loss_per_move": 2.7,
+  "blunders_per_100": 2.71,
+  "errors_per_100": 6.0,
+  "rating_range": null,
+  "time_controls": {
+   "": 14
+  },
+  "openings_seen": 1,
+  "clock_data": false
+ },
+ "by_phase": {
+  "opening": {
+   "moves": 123,
+   "accuracy": 91.86,
+   "mean_loss": 2.17,
+   "blunders_per_100": 1.63,
+   "errors_per_100": 4.07
+  },
+  "middlegame": {
+   "moves": 302,
+   "accuracy": 88.58,
+   "mean_loss": 3.62,
+   "blunders_per_100": 3.97,
+   "errors_per_100": 8.61
+  },
+  "endgame": {
+   "moves": 92,
+   "accuracy": 98.26,
+   "mean_loss": 0.41,
+   "blunders_per_100": 0.0,
+   "errors_per_100": 0.0
+  }
+ },
+ "by_position_state": {
+  "winning": {
+   "moves": 252,
+   "accuracy": 95.04,
+   "mean_loss": 1.34,
+   "blunders_per_100": 0.4,
+   "errors_per_100": 1.59
+  },
+  "better": {
+   "moves": 50,
+   "accuracy": 82.09,
+   "mean_loss": 6.33,
+   "blunders_per_100": 10.0,
+   "errors_per_100": 18.0
+  },
+  "equal": {
+   "moves": 161,
+   "accuracy": 87.86,
+   "mean_loss": 3.81,
+   "blunders_per_100": 4.97,
+   "errors_per_100": 10.56
+  },
+  "worse": {
+   "moves": 19,
+   "accuracy": 88.17,
+   "mean_loss": 3.08,
+   "blunders_per_100": 0.0,
+   "errors_per_100": 5.26
+  },
+  "losing": {
+   "moves": 35,
+   "accuracy": 91.83,
+   "mean_loss": 2.03,
+   "blunders_per_100": 0.0,
+   "errors_per_100": 0.0
+  }
+ },
+ "by_color": {
+  "white": {
+   "moves": 268,
+   "accuracy": 91.73,
+   "mean_loss": 2.51,
+   "blunders_per_100": 2.99,
+   "errors_per_100": 5.22
+  },
+  "black": {
+   "moves": 249,
+   "accuracy": 90.38,
+   "mean_loss": 2.91,
+   "blunders_per_100": 2.41,
+   "errors_per_100": 6.83
+  }
+ },
+ "time": {},
+ "motifs": {
+  "missed": {
+   "pin": 4,
+   "wins_material": 4,
+   "fork": 3,
+   "zwischenzug": 2,
+   "absolute_pin": 2,
+   "removal_of_the_guard": 1,
+   "mating_attack": 1
+  },
+  "allowed": {
+   "fork": 3,
+   "pin": 3,
+   "zwischenzug": 3,
+   "undefended_piece": 2,
+   "wins_material": 1,
+   "absolute_pin": 1,
+   "skewer": 1,
+   "discovered_attack": 1
+  },
+  "errors_considered": 31
+ },
+ "pieces": {
+  "your_moving_piece": {
+   "pawn": 9,
+   "bishop": 7,
+   "rook": 7,
+   "knight": 6,
+   "queen": 2
+  },
+  "opponent_punishing_piece": {
+   "queen": 7,
+   "rook": 2
+  },
+  "your_pieces_hit": {
+   "bishop": 5,
+   "rook": 5,
+   "pawn": 4,
+   "king": 3,
+   "queen": 2,
+   "knight": 1
+  }
+ },
+ "openings": [
+  {
+   "opening": "unknown",
+   "games": 14,
+   "score_pct": 60.7,
+   "accuracy": 91.08,
+   "mean_loss": 2.7,
+   "first_error_move": 11,
+   "colors": {
+    "white": 7,
+    "black": 7
+   }
+  }
+ ],
+ "conversion": {
+  "games_reaching_winning": 10,
+  "converted": 8,
+  "conversion_pct": 0.8,
+  "games_reaching_losing": 5,
+  "saved": 1,
+  "save_pct": 0.2,
+  "thrown_away": [
+   {
+    "opening": "unknown",
+    "peak_win_pct": 82.9,
+    "result": "loss",
+    "date": "????.??.??"
+   },
+   {
+    "opening": "unknown",
+    "peak_win_pct": 92.0,
+    "result": "loss",
+    "date": "????.??.??"
+   }
+  ]
+ },
+ "findings": [
+  {
+   "key": "capture_reflex",
+   "title": "The capture gets played because it is a capture",
+   "definition": "Acquisitiveness, a cousin of loss aversion: taking material is concrete and immediate, so it gets chosen over quiet moves without being compared to them.",
+   "signal": "Share of your mistakes that were captures, against the share of your legal moves that were captures.",
+   "evidence": "9 of 31 mistakes (29%) were captures, but only 8% of your legal moves were (3.5x).",
+   "n": 31,
+   "strength": "strong",
+   "drill": "When a capture looks obvious, force yourself to write down one non-capturing candidate and compare them. The habit is not 'stop taking' -- it is 'take on purpose'.",
+   "numbers": {
+    "hits": 9,
+    "n": 31,
+    "observed": 0.29,
+    "expected": 0.083,
+    "lift": 3.51
+   }
+  },
+  {
+   "key": "pawn_moves",
+   "title": "Pawn moves are where you go wrong",
+   "definition": "Not a tactical gap. Pawn moves are irreversible and are usually about structure rather than a concrete threat, so they are judged rather than calculated -- and judgement is the slower thing to build. They are also what decides balanced positions, which is where the rest of your errors live.",
+   "signal": "Share of the best moves you missed that were pawn moves, against the share of pawn moves available in those same positions.",
+   "evidence": "9 of 31 missed best moves (29%) were pawn moves, against a 21% base rate (1.37x).",
+   "n": 31,
+   "strength": "moderate",
+   "drill": "In any position where nothing is forced, ask what your pawns should be doing before you ask what your pieces should be doing. Name the break you are playing for and the wing it is on -- that one question covers the pawn push you keep not making and the wrong-wing break in equal measure.",
+   "numbers": {
+    "hits": 9,
+    "n": 31,
+    "observed": 0.29,
+    "expected": 0.212,
+    "lift": 1.37
+   }
+  }
+ ],
+ "caveats": [
+  "No clock data in these games, so nothing about time management could be measured."
+ ],
+ "key_moments": [
+  {
+   "game": "retsekoj vs Maia 1400",
+   "game_id": "57cbaaae-c76",
+   "date": "????.??.??",
+   "opening": "unknown",
+   "hero_color": "white",
+   "move_number": 44,
+   "played": "g4",
+   "best": "Kh2",
+   "best_line": "44. Kh2 g5 45. hxg5 Rxg5 46. Kg1 Re7 47. Kf1 Re6",
+   "refutation": "44...Rf3+ 45. Kg2 Rxd3 46. Rf2 Rd1 47. gxh5",
+   "loss": 55.09,
+   "win_before": 74.42,
+   "win_after": 19.33,
+   "severity": "blunder",
+   "phase": "middlegame",
+   "fen": "4r3/8/3k2p1/2p1pr1p/p1PpR2P/P2N3K/1P2R1P1/8 w - - 9 44",
+   "time_spent": null,
+   "complexity": 0.1,
+   "only_move": false,
+   "missed_motifs": [],
+   "allowed_motifs": [
+    "fork",
+    "zwischenzug"
+   ],
+   "shape_tags": [
+    "piece:pawn",
+    "quiet_move"
+   ],
+   "structure": {
+    "fen": "4r3/8/3k2p1/2p1pr1p/p1PpR2P/P2N3K/1P2R1P1/8 w - - 9 44",
+    "phase": "middlegame",
+    "centre": "closed",
+    "files": {
+     "open": [
+      "f"
+     ],
+     "half_open_white": [
+      "d",
+      "e"
+     ],
+     "half_open_black": [
+      "b"
+     ]
+    },
+    "material_balance_cp": 220,
+    "white": {
+     "pawns": {
+      "count": 5,
+      "islands": 2,
+      "doubled": 0,
+      "isolated": [],
+      "passed": [],
+      "backward": []
+     },
+     "king": {
+      "square": "h3",
+      "side": "kingside",
+      "on_home_rank": false,
+      "pawn_shield": 1,
+      "ring_squares_attacked": 1
+     },
+     "outposts": [],
+     "rooks_active": [
+      "e2",
+      "e4"
+     ],
+     "mobility": 23,
+     "bishop_pair": false
+    },
+    "black": {
+     "pawns": {
+      "count": 6,
+      "islands": 3,
+      "doubled": 0,
+      "isolated": [
+       "a4"
+      ],
+      "passed": [
+       "d4",
+       "e5"
+      ],
+      "backward": []
+     },
+     "king": {
+      "square": "d6",
+      "side": "centre",
+      "on_home_rank": false,
+      "pawn_shield": 3,
+      "ring_squares_attacked": 3
+     },
+     "outposts": [],
+     "rooks_active": [
+      "f5"
+     ],
+     "mobility": 23,
+     "bishop_pair": false
+    },
+    "opposite_castling": false
+   }
+  },
+  {
+   "game": "Maia 1400 vs retsekoj",
+   "game_id": "9ea7175c-f8d",
+   "date": "????.??.??",
+   "opening": "unknown",
+   "hero_color": "black",
+   "move_number": 21,
+   "played": "Ba6",
+   "best": "Qxd4+",
+   "best_line": "21...Qxd4+ 22. Nxd4 Bxg4 23. fxg4 Rfe8 24. Rf4 Rab8 25. a3",
+   "refutation": "22. Rfd1 Bc8 23. Qh4 Qxh4 24. Nxh4 Rb8",
+   "loss": 51.98,
+   "win_before": 75.46,
+   "win_after": 23.47,
+   "severity": "blunder",
+   "phase": "middlegame",
+   "fen": "r1b2rk1/p1p2pp1/5q2/5N2/3RP1Q1/5P2/P1P3PP/5RK1 b - - 0 21",
+   "time_spent": null,
+   "complexity": 37.1,
+   "only_move": true,
+   "missed_motifs": [
+    "pin"
+   ],
+   "allowed_motifs": [],
+   "shape_tags": [
+    "piece:bishop",
+    "quiet_move"
+   ],
+   "structure": {
+    "fen": "r1b2rk1/p1p2pp1/5q2/5N2/3RP1Q1/5P2/P1P3PP/5RK1 b - - 0 21",
+    "phase": "middlegame",
+    "centre": "semi-open",
+    "files": {
+     "open": [
+      "b",
+      "d"
+     ],
+     "half_open_white": [],
+     "half_open_black": [
+      "e",
+      "h"
+     ]
+    },
+    "material_balance_cp": 190,
+    "white": {
+     "pawns": {
+      "count": 6,
+      "islands": 3,
+      "doubled": 0,
+      "isolated": [
+       "a2",
+       "c2"
+      ],
+      "passed": [],
+      "backward": []
+     },
+     "king": {
+      "square": "g1",
+      "side": "kingside",
+      "on_home_rank": true,
+      "pawn_shield": 3,
+      "ring_squares_attacked": 0
+     },
+     "outposts": [],
+     "rooks_active": [
+      "d4"
+     ],
+     "mobility": 42,
+     "bishop_pair": false
+    },
+    "black": {
+     "pawns": {
+      "count": 4,
+      "islands": 3,
+      "doubled": 0,
+      "isolated": [
+       "a7",
+       "c7"
+      ],
+      "passed": [],
+      "backward": []
+     },
+     "king": {
+      "square": "g8",
+      "side": "kingside",
+      "on_home_rank": true,
+      "pawn_shield": 2,
+      "ring_squares_attacked": 1
+     },
+     "outposts": [],
+     "rooks_active": [],
+     "mobility": 30,
+     "bishop_pair": false
+    },
+    "opposite_castling": false
+   }
+  },
+  {
+   "game": "Maia 1400 vs retsekoj",
+   "game_id": "7ca20af2-23b",
+   "date": "????.??.??",
+   "opening": "unknown",
+   "hero_color": "black",
+   "move_number": 13,
+   "played": "Be3",
+   "best": "Ne3+",
+   "best_line": "13...Ne3+ 14. Bxe3 Bxe3 15. Qe2 Bb6 16. g4 Qe6 17. Re1",
+   "refutation": "14. h3 Nh2+ 15. Rxh2 Bb6 16. c4 d5",
+   "loss": 43.68,
+   "win_before": 80.38,
+   "win_after": 36.7,
+   "severity": "blunder",
+   "phase": "middlegame",
+   "fen": "r1b2rk1/pppp1ppp/8/2b1pq2/4N1n1/3P1B2/PPP3PP/R1BQ1K1R b - - 2 13",
+   "time_spent": null,
+   "complexity": 1.4,
+   "only_move": false,
+   "missed_motifs": [
+    "fork",
+    "zwischenzug"
+   ],
+   "allowed_motifs": [],
+   "shape_tags": [
+    "piece:bishop",
+    "quiet_move"
+   ],
+   "structure": {
+    "fen": "r1b2rk1/pppp1ppp/8/2b1pq2/4N1n1/3P1B2/PPP3PP/R1BQ1K1R b - - 2 13",
+    "phase": "middlegame",
+    "centre": "semi-open",
+    "files": {
+     "open": [],
+     "half_open_white": [
+      "e",
+      "f"
+     ],
+     "half_open_black": []
+    },
+    "material_balance_cp": -200,
+    "white": {
+     "pawns": {
+      "count": 6,
+      "islands": 2,
+      "doubled": 0,
+      "isolated": [],
+      "passed": [],
+      "backward": []
+     },
+     "king": {
+      "square": "f1",
+      "side": "kingside",
+      "on_home_rank": true,
+      "pawn_shield": 1,
+      "ring_squares_attacked": 2
+     },
+     "outposts": [],
+     "rooks_active": [],
+     "mobility": 30,
+     "bishop_pair": true
+    },
+    "black": {
+     "pawns": {
+      "count": 8,
+      "islands": 1,
+      "doubled": 0,
+      "isolated": [],
+      "passed": [],
+      "backward": []
+     },
+     "king": {
+      "square": "g8",
+      "side": "kingside",
+      "on_home_rank": true,
+      "pawn_shield": 3,
+      "ring_squares_attacked": 0
+     },
+     "outposts": [],
+     "rooks_active": [],
+     "mobility": 38,
+     "bishop_pair": true
+    },
+    "opposite_castling": false
+   }
+  },
+  {
+   "game": "retsekoj vs Maia 1400",
+   "game_id": "da7d9c87-24c",
+   "date": "????.??.??",
+   "opening": "unknown",
+   "hero_color": "white",
+   "move_number": 27,
+   "played": "Rg3",
+   "best": "Qh7+",
+   "best_line": "27. Qh7+ Kf7 28. Qg6+ Kg8 29. Qh7+",
+   "refutation": "27...Rf7 28. Rge3 c3 29. Qg3 Qb5 30. Rxc3",
+   "loss": 40.24,
+   "win_before": 50.0,
+   "win_after": 9.76,
+   "severity": "blunder",
+   "phase": "middlegame",
+   "fen": "r4rk1/1b4b1/p2p1pQ1/5P2/2p5/7R/Pq4PP/4R2K w - - 4 27",
+   "time_spent": null,
+   "complexity": 40.3,
+   "only_move": true,
+   "missed_motifs": [],
+   "allowed_motifs": [],
+   "shape_tags": [
+    "piece:rook",
+    "quiet_move"
+   ],
+   "structure": {
+    "fen": "r4rk1/1b4b1/p2p1pQ1/5P2/2p5/7R/Pq4PP/4R2K w - - 4 27",
+    "phase": "middlegame",
+    "centre": "semi-open",
+    "files": {
+     "open": [
+      "b",
+      "e"
+     ],
+     "half_open_white": [
+      "c",
+      "d"
+     ],
+     "half_open_black": [
+      "g",
+      "h"
+     ]
+    },
+    "material_balance_cp": -660,
+    "white": {
+     "pawns": {
+      "count": 4,
+      "islands": 2,
+      "doubled": 0,
+      "isolated": [
+       "a2"
+      ],
+      "passed": [
+       "h2"
+      ],
+      "backward": []
+     },
+     "king": {
+      "square": "h1",
+      "side": "kingside",
+      "on_home_rank": true,
+      "pawn_shield": 2,
+      "ring_squares_attacked": 1
+     },
+     "outposts": [],
+     "rooks_active": [
+      "e1"
+     ],
+     "mobility": 38,
+     "bishop_pair": false
+    },
+    "black": {
+     "pawns": {
+      "count": 4,
+      "islands": 3,
+      "doubled": 0,
+      "isolated": [
+       "a6",
+       "f6"
+      ],
+      "passed": [
+       "c4",
+       "d6"
+      ],
+      "backward": []
+     },
+     "king": {
+      "square": "g8",
+      "side": "kingside",
+      "on_home_rank": true,
+      "pawn_shield": 1,
+      "ring_squares_attacked": 4
+     },
+     "outposts": [],
+     "rooks_active": [],
+     "mobility": 36,
+     "bishop_pair": true
+    },
+    "opposite_castling": false
+   }
+  },
+  {
+   "game": "retsekoj vs Maia 1400",
+   "game_id": "da7d9c87-24c",
+   "date": "????.??.??",
+   "opening": "unknown",
+   "hero_color": "white",
+   "move_number": 23,
+   "played": "Re1",
+   "best": "Qh7+",
+   "best_line": "23. Qh7+ Kf7 24. Qg6+ Kg8",
+   "refutation": "23...Re8 24. Re6 Bd5 25. Rxe8+ Qxe8 26. Qxe8+",
+   "loss": 39.74,
+   "win_before": 50.0,
+   "win_after": 10.26,
+   "severity": "blunder",
+   "phase": "middlegame",
+   "fen": "r2q1rk1/1b4b1/p2p1p2/5P1Q/2p5/7R/PP4PP/R5K1 w - - 0 23",
+   "time_spent": null,
+   "complexity": 38.5,
+   "only_move": true,
+   "missed_motifs": [],
+   "allowed_motifs": [],
+   "shape_tags": [
+    "piece:rook",
+    "quiet_move",
+    "long_quiet_move"
+   ],
+   "structure": {
+    "fen": "r2q1rk1/1b4b1/p2p1p2/5P1Q/2p5/7R/PP4PP/R5K1 w - - 0 23",
+    "phase": "middlegame",
+    "centre": "semi-open",
+    "files": {
+     "open": [
+      "e"
+     ],
+     "half_open_white": [
+      "c",
+      "d"
+     ],
+     "half_open_black": [
+      "b",
+      "g",
+      "h"
+     ]
+    },
+    "material_balance_cp": -560,
+    "white": {
+     "pawns": {
+      "count": 5,
+      "islands": 2,
+      "doubled": 0,
+      "isolated": [],
+      "passed": [
+       "h2"
+      ],
+      "backward": []
+     },
+     "king": {
+      "square": "g1",
+      "side": "kingside",
+      "on_home_rank": true,
+      "pawn_shield": 2,
+      "ring_squares_attacked": 1
+     },
+     "outposts": [],
+     "rooks_active": [],
+     "mobility": 34,
+     "bishop_pair": false
+    },
+    "black": {
+     "pawns": {
+      "count": 4,
+      "islands": 3,
+      "doubled": 0,
+      "isolated": [
+       "a6",
+       "f6"
+      ],
+      "passed": [
+       "d6"
+      ],
+      "backward": []
+     },
+     "king": {
+      "square": "g8",
+      "side": "kingside",
+      "on_home_rank": true,
+      "pawn_shield": 1,
+      "ring_squares_attacked": 3
+     },
+     "outposts": [],
+     "rooks_active": [],
+     "mobility": 24,
+     "bishop_pair": true
+    },
+    "opposite_castling": false
+   }
+  },
+  {
+   "game": "Maia 1500 vs retsekoj",
+   "game_id": "95ca2c2c-91a",
+   "date": "????.??.??",
+   "opening": "unknown",
+   "hero_color": "black",
+   "move_number": 33,
+   "played": "Be6",
+   "best": "Bb5",
+   "best_line": "33...Bb5 34. e6 Re7 35. Qh5 Rxg6 36. Rxg6+ Rg7 37. Rh6",
+   "refutation": "34. Rxg7+ Rxg7 35. Rxg7+ Qxg7 36. Qxe6+ Kh8",
+   "loss": 39.64,
+   "win_before": 50.0,
+   "win_after": 10.36,
+   "severity": "blunder",
+   "phase": "middlegame",
+   "fen": "6k1/2qb1rr1/p5RQ/3pPp2/3P4/2P5/P4P2/6RK b - - 4 33",
+   "time_spent": null,
+   "complexity": 0.0,
+   "only_move": false,
+   "missed_motifs": [],
+   "allowed_motifs": [
+    "pin",
+    "discovered_attack"
+   ],
+   "shape_tags": [
+    "piece:bishop",
+    "quiet_move",
+    "sacrifice"
+   ],
+   "structure": {
+    "fen": "6k1/2qb1rr1/p5RQ/3pPp2/3P4/2P5/P4P2/6RK b - - 4 33",
+    "phase": "middlegame",
+    "centre": "semi-open",
+    "files": {
+     "open": [
+      "b",
+      "g",
+      "h"
+     ],
+     "half_open_white": [],
+     "half_open_black": [
+      "c",
+      "e"
+     ]
+    },
+    "material_balance_cp": -130,
+    "white": {
+     "pawns": {
+      "count": 5,
+      "islands": 2,
+      "doubled": 0,
+      "isolated": [
+       "a2"
+      ],
+      "passed": [
+       "e5"
+      ],
+      "backward": []
+     },
+     "king": {
+      "square": "h1",
+      "side": "kingside",
+      "on_home_rank": true,
+      "pawn_shield": 0,
+      "ring_squares_attacked": 0
+     },
+     "outposts": [],
+     "rooks_active": [
+      "g1",
+      "g6"
+     ],
+     "mobility": 41,
+     "bishop_pair": false
+    },
+    "black": {
+     "pawns": {
+      "count": 3,
+      "islands": 3,
+      "doubled": 0,
+      "isolated": [
+       "d5",
+       "f5",
+       "a6"
+      ],
+      "passed": [],
+      "backward": []
+     },
+     "king": {
+      "square": "g8",
+      "side": "kingside",
+      "on_home_rank": true,
+      "pawn_shield": 0,
+      "ring_squares_attacked": 3
+     },
+     "outposts": [],
+     "rooks_active": [
+      "g7"
+     ],
+     "mobility": 26,
+     "bishop_pair": false
+    },
+    "opposite_castling": false
+   }
+  },
+  {
+   "game": "retsekoj vs Maia 1400",
+   "game_id": "da7d9c87-24c",
+   "date": "????.??.??",
+   "opening": "unknown",
+   "hero_color": "white",
+   "move_number": 21,
+   "played": "Rh3+",
+   "best": "f6",
+   "best_line": "21. f6 Qxf6 22. Rxf6 Bxf6 23. Re1 Rae8 24. Rxe8 Rxe8",
+   "refutation": "21...Kg8 22. Rd1 Qf6 23. Rg3 Rfd8 24. h4",
+   "loss": 34.38,
+   "win_before": 45.41,
+   "win_after": 11.03,
+   "severity": "blunder",
+   "phase": "middlegame",
+   "fen": "r2q1r1k/1b3pb1/p2p4/5P2/2p3Q1/5R2/PP4PP/R5K1 w - - 0 21",
+   "time_spent": null,
+   "complexity": 34.3,
+   "only_move": true,
+   "missed_motifs": [],
+   "allowed_motifs": [],
+   "shape_tags": [
+    "piece:rook",
+    "check"
+   ],
+   "structure": {
+    "fen": "r2q1r1k/1b3pb1/p2p4/5P2/2p3Q1/5R2/PP4PP/R5K1 w - - 0 21",
+    "phase": "middlegame",
+    "centre": "semi-open",
+    "files": {
+     "open": [
+      "e"
+     ],
+     "half_open_white": [
+      "c",
+      "d"
+     ],
+     "half_open_black": [
+      "b",
+      "g",
+      "h"
+     ]
+    },
+    "material_balance_cp": -560,
+    "white": {
+     "pawns": {
+      "count": 5,
+      "islands": 2,
+      "doubled": 0,
+      "isolated": [],
+      "passed": [
+       "h2"
+      ],
+      "backward": []
+     },
+     "king": {
+      "square": "g1",
+      "side": "kingside",
+      "on_home_rank": true,
+      "pawn_shield": 2,
+      "ring_squares_attacked": 0
+     },
+     "outposts": [],
+     "rooks_active": [],
+     "mobility": 37,
+     "bishop_pair": false
+    },
+    "black": {
+     "pawns": {
+      "count": 4,
+      "islands": 3,
+      "doubled": 0,
+      "isolated": [
+       "a6",
+       "f7"
+      ],
+      "passed": [
+       "d6"
+      ],
+      "backward": []
+     },
+     "king": {
+      "square": "h8",
+      "side": "kingside",
+      "on_home_rank": true,
+      "pawn_shield": 0,
+      "ring_squares_attacked": 1
+     },
+     "outposts": [],
+     "rooks_active": [],
+     "mobility": 33,
+     "bishop_pair": true
+    },
+    "opposite_castling": false
+   }
+  },
+  {
+   "game": "retsekoj vs Maia 1500",
+   "game_id": "578ad72d-3b4",
+   "date": "????.??.??",
+   "opening": "unknown",
+   "hero_color": "white",
+   "move_number": 21,
+   "played": "Qf3",
+   "best": "Qd1",
+   "best_line": "21. Qd1 Qe4 22. Rf2 Rae8 23. a4 Re6 24. Re2 Qf5",
+   "refutation": "21...Qe1+ 22. Qf1 Qxc3 23. Rb1 Qxd4+ 24. Rf2",
+   "loss": 31.41,
+   "win_before": 50.74,
+   "win_after": 19.33,
+   "severity": "blunder",
+   "phase": "middlegame",
+   "fen": "r4rk1/5pp1/p5np/1p1pPR2/3P2Qq/P1P5/6PP/R1B3K1 w - - 5 21",
+   "time_spent": null,
+   "complexity": 0.6,
+   "only_move": false,
+   "missed_motifs": [],
+   "allowed_motifs": [
+    "pin",
+    "zwischenzug"
+   ],
+   "shape_tags": [
+    "piece:queen",
+    "quiet_move",
+    "backward_move",
+    "motif:pin"
+   ],
+   "structure": {
+    "fen": "r4rk1/5pp1/p5np/1p1pPR2/3P2Qq/P1P5/6PP/R1B3K1 w - - 5 21",
+    "phase": "middlegame",
+    "centre": "semi-open",
+    "files": {
+     "open": [],
+     "half_open_white": [
+      "b",
+      "f"
+     ],
+     "half_open_black": [
+      "c",
+      "e"
+     ]
+    },
+    "material_balance_cp": 10,
+    "white": {
+     "pawns": {
+      "count": 6,
+      "islands": 3,
+      "doubled": 0,
+      "isolated": [
+       "a3"
+      ],
+      "passed": [],
+      "backward": []
+     },
+     "king": {
+      "square": "g1",
+      "side": "kingside",
+      "on_home_rank": true,
+      "pawn_shield": 2,
+      "ring_squares_attacked": 2
+     },
+     "outposts": [],
+     "rooks_active": [
+      "f5"
+     ],
+     "mobility": 34,
+     "bishop_pair": false
+    },
+    "black": {
+     "pawns": {
+      "count": 6,
+      "islands": 3,
+      "doubled": 0,
+      "isolated": [
+       "d5"
+      ],
+      "passed": [],
+      "backward": []
+     },
+     "king": {
+      "square": "g8",
+      "side": "kingside",
+      "on_home_rank": true,
+      "pawn_shield": 3,
+      "ring_squares_attacked": 1
+     },
+     "outposts": [],
+     "rooks_active": [],
+     "mobility": 30,
+     "bishop_pair": false
+    },
+    "opposite_castling": false
+   }
+  },
+  {
+   "game": "Maia 1500 vs retsekoj",
+   "game_id": "95ca2c2c-91a",
+   "date": "????.??.??",
+   "opening": "unknown",
+   "hero_color": "black",
+   "move_number": 18,
+   "played": "Rf7",
+   "best": "f4",
+   "best_line": "18...f4 19. Ne1 Bf5 20. Qd1 f3 21. a3 Rc8 22. Nd3",
+   "refutation": "19. Bf4 Be6 20. Ne2 Rc8 21. Qd3 Nd7",
+   "loss": 28.86,
+   "win_before": 63.04,
+   "win_after": 34.18,
+   "severity": "blunder",
+   "phase": "middlegame",
+   "fen": "r1bq1rk1/4b1pp/pn6/1p1pPp2/3P4/2N2N2/PPQ2P1P/R1B3RK b - - 2 18",
+   "time_spent": null,
+   "complexity": 28.1,
+   "only_move": true,
+   "missed_motifs": [],
+   "allowed_motifs": [],
+   "shape_tags": [
+    "piece:rook",
+    "quiet_move"
+   ],
+   "structure": {
+    "fen": "r1bq1rk1/4b1pp/pn6/1p1pPp2/3P4/2N2N2/PPQ2P1P/R1B3RK b - - 2 18",
+    "phase": "middlegame",
+    "centre": "semi-open",
+    "files": {
+     "open": [
+      "c"
+     ],
+     "half_open_white": [
+      "g"
+     ],
+     "half_open_black": [
+      "e"
+     ]
+    },
+    "material_balance_cp": -10,
+    "white": {
+     "pawns": {
+      "count": 6,
+      "islands": 3,
+      "doubled": 0,
+      "isolated": [
+       "h2"
+      ],
+      "passed": [
+       "e5"
+      ],
+      "backward": []
+     },
+     "king": {
+      "square": "h1",
+      "side": "kingside",
+      "on_home_rank": true,
+      "pawn_shield": 1,
+      "ring_squares_attacked": 0
+     },
+     "outposts": [],
+     "rooks_active": [
+      "g1"
+     ],
+     "mobility": 43,
+     "bishop_pair": false
+    },
+    "black": {
+     "pawns": {
+      "count": 6,
+      "islands": 3,
+      "doubled": 0,
+      "isolated": [
+       "d5"
+      ],
+      "passed": [],
+      "backward": []
+     },
+     "king": {
+      "square": "g8",
+      "side": "kingside",
+      "on_home_rank": true,
+      "pawn_shield": 2,
+      "ring_squares_attacked": 1
+     },
+     "outposts": [],
+     "rooks_active": [],
+     "mobility": 31,
+     "bishop_pair": true
+    },
+    "opposite_castling": false
+   }
+  },
+  {
+   "game": "Maia 1500 vs retsekoj",
+   "game_id": "95ca2c2c-91a",
+   "date": "????.??.??",
+   "opening": "unknown",
+   "hero_color": "black",
+   "move_number": 19,
+   "played": "g6",
+   "best": "f4",
+   "best_line": "19...f4 20. Rae1 Bf5 21. Rxg7+ Kh8 22. Rxf7 Bxc2 23. e6",
+   "refutation": "20. Ne2 Ra7 21. Nf4 Bf8 22. Bxf8 Qxf8",
+   "loss": 25.7,
+   "win_before": 46.32,
+   "win_after": 20.63,
+   "severity": "blunder",
+   "phase": "middlegame",
+   "fen": "r1bq2k1/4brpp/pn5B/1p1pPp2/3P4/2N2N2/PPQ2P1P/R5RK b - - 4 19",
+   "time_spent": null,
+   "complexity": 11.1,
+   "only_move": false,
+   "missed_motifs": [],
+   "allowed_motifs": [],
+   "shape_tags": [
+    "piece:pawn",
+    "quiet_move"
+   ],
+   "structure": {
+    "fen": "r1bq2k1/4brpp/pn5B/1p1pPp2/3P4/2N2N2/PPQ2P1P/R5RK b - - 4 19",
+    "phase": "middlegame",
+    "centre": "semi-open",
+    "files": {
+     "open": [
+      "c"
+     ],
+     "half_open_white": [
+      "g"
+     ],
+     "half_open_black": [
+      "e"
+     ]
+    },
+    "material_balance_cp": -10,
+    "white": {
+     "pawns": {
+      "count": 6,
+      "islands": 3,
+      "doubled": 0,
+      "isolated": [
+       "h2"
+      ],
+      "passed": [
+       "e5"
+      ],
+      "backward": []
+     },
+     "king": {
+      "square": "h1",
+      "side": "kingside",
+      "on_home_rank": true,
+      "pawn_shield": 1,
+      "ring_squares_attacked": 0
+     },
+     "outposts": [],
+     "rooks_active": [
+      "g1"
+     ],
+     "mobility": 51,
+     "bishop_pair": false
+    },
+    "black": {
+     "pawns": {
+      "count": 6,
+      "islands": 3,
+      "doubled": 0,
+      "isolated": [
+       "d5"
+      ],
+      "passed": [],
+      "backward": []
+     },
+     "king": {
+      "square": "g8",
+      "side": "kingside",
+      "on_home_rank": true,
+      "pawn_shield": 2,
+      "ring_squares_attacked": 1
+     },
+     "outposts": [],
+     "rooks_active": [],
+     "mobility": 30,
+     "bishop_pair": true
+    },
+    "opposite_castling": false
+   }
+  }
+ ],
+ "hero": "retsekoj",
+ "context": {
+  "games_with_context": 14,
+  "games_total": 14,
+  "columns": [
+   "hours_since_6am",
+   "hours_since_previous",
+   "games_already_today",
+   "after_8pm"
+  ],
+  "correlations": [
+   {
+    "column": "hours_since_6am",
+    "metric": "score",
+    "n": 14,
+    "r": -0.73,
+    "needed_for_significance": 0.53,
+    "notable": true
+   },
+   {
+    "column": "games_already_today",
+    "metric": "score",
+    "n": 14,
+    "r": -0.63,
+    "needed_for_significance": 0.53,
+    "notable": true
+   },
+   {
+    "column": "hours_since_6am",
+    "metric": "accuracy",
+    "n": 14,
+    "r": -0.47,
+    "needed_for_significance": 0.53,
+    "notable": false
+   },
+   {
+    "column": "games_already_today",
+    "metric": "accuracy",
+    "n": 14,
+    "r": -0.43,
+    "needed_for_significance": 0.53,
+    "notable": false
+   },
+   {
+    "column": "hours_since_previous",
+    "metric": "trick_hit_rate",
+    "n": 12,
+    "r": -0.41,
+    "needed_for_significance": 0.57,
+    "notable": false
+   },
+   {
+    "column": "hours_since_6am",
+    "metric": "mean_loss",
+    "n": 14,
+    "r": 0.4,
+    "needed_for_significance": 0.53,
+    "notable": false
+   },
+   {
+    "column": "games_already_today",
+    "metric": "mean_loss",
+    "n": 14,
+    "r": 0.4,
+    "needed_for_significance": 0.53,
+    "notable": false
+   },
+   {
+    "column": "games_already_today",
+    "metric": "blunders",
+    "n": 14,
+    "r": 0.39,
+    "needed_for_significance": 0.53,
+    "notable": false
+   },
+   {
+    "column": "hours_since_6am",
+    "metric": "trick_hit_rate",
+    "n": 14,
+    "r": -0.34,
+    "needed_for_significance": 0.53,
+    "notable": false
+   },
+   {
+    "column": "hours_since_6am",
+    "metric": "blunders",
+    "n": 14,
+    "r": 0.24,
+    "needed_for_significance": 0.53,
+    "notable": false
+   },
+   {
+    "column": "hours_since_previous",
+    "metric": "score",
+    "n": 12,
+    "r": -0.17,
+    "needed_for_significance": 0.57,
+    "notable": false
+   },
+   {
+    "column": "hours_since_previous",
+    "metric": "blunders",
+    "n": 12,
+    "r": -0.17,
+    "needed_for_significance": 0.57,
+    "notable": false
+   },
+   {
+    "column": "hours_since_previous",
+    "metric": "accuracy",
+    "n": 12,
+    "r": -0.07,
+    "needed_for_significance": 0.57,
+    "notable": false
+   },
+   {
+    "column": "games_already_today",
+    "metric": "trick_hit_rate",
+    "n": 14,
+    "r": -0.05,
+    "needed_for_significance": 0.53,
+    "notable": false
+   },
+   {
+    "column": "hours_since_previous",
+    "metric": "mean_loss",
+    "n": 12,
+    "r": 0.01,
+    "needed_for_significance": 0.57,
+    "notable": false
+   }
+  ],
+  "groups": [
+   {
+    "column": "after_8pm",
+    "value": "no",
+    "n": 8,
+    "score": 0.9,
+    "accuracy": 92.7,
+    "blunders": 0.5,
+    "trick_hit_rate": 76.1,
+    "mean_loss": 2.1
+   },
+   {
+    "column": "after_8pm",
+    "value": "yes",
+    "n": 6,
+    "score": 0.2,
+    "accuracy": 87.5,
+    "blunders": 1.7,
+    "trick_hit_rate": 55.0,
+    "mean_loss": 3.9
+   }
+  ],
+  "comparisons": 15,
+  "expected_false_positives": 0.8,
+  "caveats": [
+   "15 correlations were run, so chance alone would be expected to decorate about 0.8 of them. Treat the largest one as a hypothesis to test on new games, not as a result.",
+   "These fields are the only numbers in this report recorded *before* the game, so unlike everything else they cannot have been coloured by how it went. That is what makes them worth logging."
+  ]
+ }
+}
