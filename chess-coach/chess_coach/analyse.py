@@ -256,7 +256,14 @@ def analyse_game(
             counts[record.severity] += 1
 
     return {
-        "id": game.headers.get("Site", "") or game.headers.get("Link", ""),
+        # Prefer a per-game identifier. Some sites put the same Site header on
+        # every game, which would make a context join useless.
+        "id": (
+            game.headers.get("ID")
+            or game.headers.get("GameId")
+            or game.headers.get("Link")
+            or game.headers.get("Site", "")
+        ),
         "date": game.headers.get("UTCDate", game.headers.get("Date", "")),
         "time": game.headers.get("UTCTime", ""),
         "white": game.headers.get("White", ""),

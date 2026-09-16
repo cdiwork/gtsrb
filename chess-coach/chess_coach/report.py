@@ -220,6 +220,51 @@ def render_markdown(profile: Dict) -> str:
                 )
             out.append("")
 
+    # --- context ----------------------------------------------------------
+    context = profile.get("context") or {}
+    if context.get("games_with_context"):
+        out += [
+            "## What was going on before the game",
+            "",
+            f"{context['games_with_context']} of {context['games_total']} games "
+            "have context logged. These are the only numbers in this report "
+            "written down *before* the first move, so unlike everything else "
+            "they cannot have been coloured by how the game went.",
+            "",
+        ]
+        if context.get("correlations"):
+            out += [
+                "`r` runs from -1 to +1. `Need` is roughly the size a "
+                "correlation has to reach at this sample size before it means "
+                "anything; below that, the honest reading is *nothing here yet*.",
+                "",
+            ]
+            out += _table(
+                ["Context", "Metric", "n", "r", "Need", ""],
+                [
+                    [row["column"].replace("_", " "),
+                     row["metric"].replace("_", " "), row["n"],
+                     f"{row['r']:+.2f}",
+                     row["needed_for_significance"] or "-",
+                     "**notable**" if row["notable"] else ""]
+                    for row in context["correlations"]
+                ],
+            )
+        if context.get("groups"):
+            out += ["Context values that are words rather than numbers:", ""]
+            for row in context["groups"]:
+                bits = ", ".join(
+                    f"{k.replace('_', ' ')} {v}" for k, v in row.items()
+                    if k not in ("column", "value", "n")
+                )
+                out.append(
+                    f"- {row['column'].replace('_', ' ')} = **{row['value']}** "
+                    f"(n={row['n']}): {bits}"
+                )
+            out.append("")
+        for caveat in context.get("caveats", []):
+            out += [f"> {caveat}", ""]
+
     # --- positions --------------------------------------------------------
     moments = profile.get("key_moments") or []
     if moments:
@@ -604,6 +649,37 @@ def render_html(profile: Dict) -> str:
             series=2,
             legend=["You missed it", "Played on you"],
         ))
+
+    # --- context ---
+    context = profile.get("context") or {}
+    if context.get("games_with_context"):
+        parts.append("<h2>What was going on before the game</h2>")
+        parts.append(
+            f'<p>{context["games_with_context"]} of {context["games_total"]} '
+            "games have context logged. These are the only numbers on this page "
+            "written down <em>before</em> the first move, so unlike everything "
+            "else they cannot have been coloured by how the game went.</p>"
+        )
+        if context.get("correlations"):
+            parts.append(_html_table(
+                ["Context", "Metric", "n", "r", "Need", ""],
+                [[row["column"].replace("_", " "),
+                  row["metric"].replace("_", " "), row["n"],
+                  f"{row['r']:+.2f}", row["needed_for_significance"] or "-",
+                  "notable" if row["notable"] else ""]
+                 for row in context["correlations"]],
+            ))
+        for row in context.get("groups", []):
+            bits = ", ".join(
+                f"{k.replace('_', ' ')} {v}" for k, v in row.items()
+                if k not in ("column", "value", "n")
+            )
+            parts.append(
+                f'<p>{_e(row["column"].replace("_", " "))} = '
+                f'<strong>{_e(row["value"])}</strong> (n={row["n"]}): {_e(bits)}</p>'
+            )
+        for caveat in context.get("caveats", []):
+            parts.append(f'<div class="note">{_e(caveat)}</div>')
 
     # --- openings ---
     openings = profile.get("openings") or []

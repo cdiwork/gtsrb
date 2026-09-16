@@ -150,11 +150,42 @@ def cmd_profile(args: argparse.Namespace) -> int:
     data = _load_analysis(args.analysis)
     profile = build_profile(data["games"], moments=args.moments)
     profile["hero"] = data.get("hero", "")
+    if getattr(args, "context", None):
+        from .context import correlate, load_context, render_context
+
+        rows = load_context(args.context)
+        if not rows:
+            _log(f"warning: no usable rows in {args.context} (need a game_id column)")
+        report = correlate(data["games"], rows)
+        if not report["games_with_context"]:
+            _log(
+                f"warning: none of the {len(rows)} context rows matched a game id. "
+                "Run `chess-coach context-template` to get the ids right."
+            )
+        else:
+            profile["context"] = report
+            _log(render_context(report))
     Path(args.out).write_text(json.dumps(profile, indent=1), encoding="utf-8")
     findings = profile["findings"]
     _log(f"profile for {profile['hero']}: {len(findings)} findings -> {args.out}")
     for finding in findings:
         _log(f"  [{finding['strength']:8s}] {finding['title']}")
+    return 0
+
+
+def cmd_context_template(args: argparse.Namespace) -> int:
+    """Emit a CSV with one row per analysed game, ready to fill in."""
+    from .context import TEMPLATE_COLUMNS, write_template
+
+    data = _load_analysis(args.analysis)
+    written = write_template(data["games"], args.out)
+    _log(f"wrote {written} rows to {args.out}")
+    _log("columns: " + ", ".join(TEMPLATE_COLUMNS))
+    _log(
+        "Fill these in *before* you play, not afterwards. Anything recorded "
+        "after the game has already been coloured by how it went, and that is "
+        "the one thing this file exists to avoid."
+    )
     return 0
 
 
@@ -324,7 +355,19 @@ def build_parser() -> argparse.ArgumentParser:
     profile_parser.add_argument("analysis")
     profile_parser.add_argument("--moments", type=int, default=10)
     profile_parser.add_argument("-o", "--out", default="profile.json")
+    profile_parser.add_argument(
+        "--context", metavar="CSV",
+        help="pre-game context to correlate against results "
+             "(see the context-template command)")
     profile_parser.set_defaults(func=cmd_profile)
+
+    context_parser = subs.add_parser(
+        "context-template",
+        help="write a CSV of pre-game context to fill in, one row per game",
+    )
+    context_parser.add_argument("analysis")
+    context_parser.add_argument("-o", "--out", default="context.csv")
+    context_parser.set_defaults(func=cmd_context_template)
 
     report_parser = subs.add_parser("report", help="render the profile for humans")
     report_parser.add_argument("profile")

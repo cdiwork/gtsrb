@@ -108,6 +108,33 @@ developing move in the database scores as a brilliancy.
 
 It runs on an existing `analysis.json` and needs no engine.
 
+### The part the PGN cannot see
+
+A PGN records the moves and nothing else. It cannot say how much sleep you had,
+what time it was, or how many games deep into a session you were — which are
+exactly the variables that would explain a run of bad games.
+
+```bash
+chess-coach context-template analysis.json -o context.csv   # one row per game
+# fill it in BEFORE you play
+chess-coach profile analysis.json --context context.csv -o profile.json
+```
+
+The template asks for hours slept, time of day, games already played today and
+a 1–5 sharpness guess, but `--context` correlates whatever columns it finds, so
+add your own. Numeric columns are correlated; word-valued ones are grouped and
+averaged.
+
+The discipline that makes this worth anything is filling it in *before* the
+first move. Every other number in this package is measured from the game and is
+therefore contaminated by how the game went; these are not. Written down
+afterwards they are just a memory of the result, and the whole point is lost.
+
+Each correlation is printed with the size it would have to reach at that sample
+size to mean anything, and the report says how many comparisons it ran and how
+many of those chance alone would be expected to decorate. Over a dozen games
+against five metrics you will find something whether or not it is there.
+
 ### Then ask for the plans
 
 ```bash
